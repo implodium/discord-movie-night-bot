@@ -12,6 +12,5 @@
     "strictPropertyInitialization": true,        /* Enable strict checking of property initialization in classes. */
     "noImplicitThis": true,                      /* Raise error on 'this' expressions with an implied 'any' type. */
     "alwaysStrict": true
-  },
-  "files": ["src/index.ts"]
+  }
 }

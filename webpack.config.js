@@ -4,7 +4,7 @@ const path = require('path');
 
 const config = {
     mode: 'production',
-    entry: './src/index.ts',
+    entry: './src/Main/index.ts',
     output: {
         path: path.resolve(__dirname, 'dist'),
     },
