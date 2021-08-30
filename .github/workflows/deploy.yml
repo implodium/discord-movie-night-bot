@@ -1,0 +1,20 @@
+name: deploy docker image
+
+on:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  build-publish-image:
+    name: Build and publish the image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.3.4
+      - name: Build
+        run: docker-compose build
+      - name: Log into Docker Registry
+        run: echo ${{ secrets.REGTOKEN }} | docker login https://docker.pkg.github.com -u ${{ secrets.REGUSER }} --password-stdin
+      - name: Push
+        run: docker-compose push

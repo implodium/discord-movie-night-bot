@@ -2,11 +2,11 @@ FROM node:16.7.0-alpine3.14
 
 WORKDIR /app
 
-COPY package*.json .
+COPY package*.json ./
 
 RUN npm i
 
-COPY . .
+COPY . ./
 
 RUN npm run webpack:build:prod
 
