@@ -4,7 +4,11 @@ const path = require('path');
 
 const config = {
     mode: 'production',
+    target: 'node',
     entry: './src/Main/index.ts',
+    externals: {
+        'discord.js': `require('discord.js');`
+    },
     output: {
         path: path.resolve(__dirname, 'dist'),
     },
@@ -29,7 +33,9 @@ const config = {
         ],
     },
     resolve: {
-        extensions: ['.tsx', '.ts', '.js'],
+        extensions: ['.tsx', '.ts', '.js', 'json'],
+        modules: ['node_modules'],
+        mainFields: ['module', 'main']
     },
 };
 
