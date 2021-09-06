@@ -24,11 +24,21 @@ npm start
 #### Run
 
 ```
-npm run app
+docker-compose -e TOKEN=<Your Token> up --build
 ```
+
+- `--build` is for building the application before starting
+- `-e TOKEN=<Your Token>` place your discord bot token here
+  - you can also overwrite the `.env.prod` file
 
 #### Build only
 
 ```
-npm run build
+docker-compose build
+```
+
+#### Pulling latest docker image from GitHub
+
+```
+docker-compose pull
 ```
