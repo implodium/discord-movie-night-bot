@@ -3,7 +3,7 @@
 const path = require('path');
 
 const config = {
-    mode: 'production',
+    mode: 'development',
     target: 'node',
     entry: './src/Main/index.ts',
     externals: {
