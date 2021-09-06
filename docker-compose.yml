@@ -2,6 +2,8 @@ version: '3.3'
 
 services:
   movie-night-app:
-    image: movie-night-app:latest
+    image: docker.pkg.github.com/implodium/discord-movie-night-bot/discord-movie-night-app:latest
     container_name: movie-night-app
     build: .
+    env_file:
+      - .env

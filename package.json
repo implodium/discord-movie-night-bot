@@ -6,15 +6,16 @@
   "scripts": {
     "start": "npm run watch",
     "watch": "npm run webpack:build:dev && (npm run webpack:watch & nodemon dist/main.js)",
-    "webpack:build:dev": "webpack --mode=development",
-    "webpack:build:prod": "webpack --mode=production --node-env=production",
-    "webpack:watch": "webpack --mode=development --watch"
+    "webpack:build:dev": "webpack --mode=development --node-env=developement --progress",
+    "webpack:build:prod": "webpack --mode=production --node-env=production --progress",
+    "webpack:watch": "webpack --mode=development --node-env=developement --watch --progress"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
     "@webpack-cli/generators": "^2.3.0",
+    "dotenv": "^10.0.0",
     "nodemon": "^2.0.12",
     "ts-loader": "^9.2.5",
     "typescript": "^4.3.5",
