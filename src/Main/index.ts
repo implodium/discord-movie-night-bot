@@ -1,6 +1,8 @@
 import {Client, Intents} from "discord.js";
 import * as dotenv from 'dotenv'
 
+dotenv.config()
+
 if (process.env.PWD && process.env.NODE_ENV) {
     let env: string | undefined;
 
@@ -16,16 +18,12 @@ if (process.env.PWD && process.env.NODE_ENV) {
             break
     }
 
-    console.log(`${process.env.PWD}/.env.${env}`)
-
     if (env) {
         dotenv.config({path: `${process.env.PWD}/.env.${env}`})
-    } else {
-        dotenv.config()
     }
-} else {
-    dotenv.config()
 }
+
+console.log(process.env.SOME_OTHER_INFO)
 
 const client = new Client({intents: Intents.FLAGS.GUILDS});
 const token = process.env.DISCORD_TOKEN
