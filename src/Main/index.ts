@@ -1,26 +1,8 @@
 import {Client, Intents} from "discord.js";
 import * as dotenv from 'dotenv'
 
-dotenv.config()
-
-if (process.env.PWD && process.env.NODE_ENV) {
-    let env: string | undefined;
-
-    switch (process.env.NODE_ENV) {
-        case 'production':
-            env = "prod"
-            break
-        case 'development':
-            env = "dev"
-            break
-        default:
-            env = undefined
-            break
-    }
-
-    if (env) {
-        dotenv.config({path: `${process.env.PWD}/.env.${env}`})
-    }
+if (process.env.NODE_ENV && process.env.PWD && process.env.NODE_ENV === 'development') {
+    dotenv.config({path: `${process.env.PWD}/.env.dev`})
 }
 
 console.log(process.env.SOME_OTHER_INFO)
