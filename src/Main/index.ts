@@ -5,8 +5,6 @@ if (process.env.NODE_ENV && process.env.PWD && process.env.NODE_ENV === 'develop
     dotenv.config({path: `${process.env.PWD}/.env.dev`})
 }
 
-console.log(process.env.SOME_OTHER_INFO)
-
 const client = new Client({intents: Intents.FLAGS.GUILDS});
 const token = process.env.DISCORD_TOKEN
 
