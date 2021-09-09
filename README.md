@@ -11,6 +11,14 @@ desired bot. This application is primary for managing a movie night. The feature
 
 ## Running the Application
 
+### Configuring `.env` files
+
+There are two .env file `.env.prod` and `.env.dev` in the config directory. For those environment there is a template 
+file 
+and a secret file.
+You can use the template file to create a new .env config or use the repository default encrypted one if you are 
+authorized.
+
 ### Develop
 
 The following command will start the application in watch mode.
@@ -24,12 +32,10 @@ npm start
 #### Run
 
 ```
-docker-compose -e TOKEN=<Your Token> up --build
+docker-compose up --build
 ```
 
 - `--build` is for building the application before starting
-- `-e TOKEN=<Your Token>` place your discord bot token here
-  - you can also overwrite the `.env.prod` file
 
 #### Build only
 

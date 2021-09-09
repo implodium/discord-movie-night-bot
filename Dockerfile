@@ -12,7 +12,8 @@ RUN npm run webpack:build:prod \
     && rm -rf node_modules \
     && npm i --only=prod \
     && cp -rf node_modules dist/node_modules \
-    && cp -rf config dist/config
+    && mkdir dist/config \
+    && cp -rf config/app dist/config/app
 
 FROM node:16.7.0-alpine3.14
 
