@@ -23,6 +23,8 @@
     "webpack-cli": "^4.8.0"
   },
   "dependencies": {
+    "@types/config": "^0.0.39",
+    "config": "^3.3.6",
     "discord.js": "^13.1.0"
   }
 }
