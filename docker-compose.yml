@@ -6,4 +6,4 @@ services:
     container_name: movie-night-app
     build: .
     env_file:
-      - .env
+      - config/env/.env.prod

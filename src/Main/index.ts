@@ -1,29 +1,15 @@
 import {Client, Intents} from "discord.js";
 import * as dotenv from 'dotenv'
+import * as config from 'config'
 
-dotenv.config()
-
-if (process.env.PWD && process.env.NODE_ENV) {
-    let env: string | undefined;
-
-    switch (process.env.NODE_ENV) {
-        case 'production':
-            env = "prod"
-            break
-        case 'development':
-            env = "dev"
-            break
-        default:
-            env = undefined
-            break
-    }
-
-    if (env) {
-        dotenv.config({path: `${process.env.PWD}/.env.${env}`})
-    }
+if (process.env.NODE_ENV) {
+    process.env.NODE_CONFIG_DIR = `${process.cwd()}/config/app`
+    config.util.loadFileConfigs()
 }
 
-console.log(process.env.SOME_OTHER_INFO)
+if (process.env.NODE_ENV && process.env.PWD && process.env.NODE_ENV === 'development') {
+    dotenv.config({path: `${process.env.PWD}/config/env/.env.dev`})
+}
 
 const client = new Client({intents: Intents.FLAGS.GUILDS});
 const token = process.env.DISCORD_TOKEN

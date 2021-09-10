@@ -37,6 +37,11 @@ const config = {
         modules: ['node_modules'],
         mainFields: ['module', 'main']
     },
+    ignoreWarnings: [
+        {
+            module: /config/
+        }
+    ],
 };
 
 module.exports = () => {

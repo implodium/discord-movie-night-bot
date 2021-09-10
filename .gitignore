@@ -187,5 +187,7 @@ dist
 
 ### ENV Files
 
-.env.prod
-.env.dev
+config/env/.env.prod
+config/env/.env.dev
+.gitsecret/keys/random_seed
+!*.secret
