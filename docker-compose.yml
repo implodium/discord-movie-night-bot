@@ -7,5 +7,3 @@ services:
     build: .
     env_file:
       - config/env/.env.prod
-    environment:
-      NODE_ENV: production
