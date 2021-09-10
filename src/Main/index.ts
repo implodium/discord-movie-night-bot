@@ -3,10 +3,8 @@ import * as dotenv from 'dotenv'
 import * as config from 'config'
 
 if (process.env.NODE_ENV) {
-    console.log(process.env.NODE_ENV)
     process.env.NODE_CONFIG_DIR = `${process.cwd()}/config/app`
     config.util.loadFileConfigs()
-    console.log(config.util.getConfigSources());
 }
 
 if (process.env.NODE_ENV && process.env.PWD && process.env.NODE_ENV === 'development') {
