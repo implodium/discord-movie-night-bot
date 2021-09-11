@@ -1,5 +1,4 @@
 import {inject, injectable} from "inversify";
-import ConfigController from "./control/ConfigController";
 import DiscordController from "./control/DiscordController";
 
 @injectable()
