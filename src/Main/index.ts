@@ -1,6 +1,9 @@
+import 'reflect-metadata'
 import {Client, Intents} from "discord.js";
 import * as dotenv from 'dotenv'
 import * as config from 'config'
+import Container from "./container/Container";
+import App from "./App";
 
 if (process.env.NODE_ENV) {
     process.env.NODE_CONFIG_DIR = `${process.cwd()}/config/app`
@@ -10,6 +13,8 @@ if (process.env.NODE_ENV) {
 if (process.env.NODE_ENV && process.env.PWD && process.env.NODE_ENV === 'development') {
     dotenv.config({path: `${process.env.PWD}/config/env/.env.dev`})
 }
+
+Container.resolve(App)
 
 const client = new Client({intents: Intents.FLAGS.GUILDS});
 const token = process.env.DISCORD_TOKEN
