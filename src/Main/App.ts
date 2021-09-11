@@ -1,10 +1,18 @@
 import {inject, injectable} from "inversify";
 import ConfigController from "./control/ConfigController";
+import DiscordController from "./control/DiscordController";
 
 @injectable()
 export default class App {
 
     public constructor(
-        @inject(ConfigController) private configController: ConfigController
-    ) { }
+        @inject(DiscordController) private discordController: DiscordController
+    ) {
+        discordController.client.on('ready', () => {
+            const user = discordController.client.user
+            if (user) {
+                console.log(`logged in as ${user.tag}`)
+            }
+        })
+    }
 }
