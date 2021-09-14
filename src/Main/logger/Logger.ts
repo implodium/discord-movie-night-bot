@@ -1,6 +1,5 @@
 import * as winston from "winston";
 import {injectable} from "inversify";
-import * as Console from "console";
 import {format} from "winston";
 
 @injectable()
@@ -16,9 +15,8 @@ export default class Logger {
 
                 new winston.transports.Console({
                     format: format.combine(
-                        winston.format.cli(),
                         winston.format.colorize(),
-                        winston.format.simple()
+                        winston.format.printf((info) => `[${info.level}] ${info.message}`),
                     )
                 }),
 
