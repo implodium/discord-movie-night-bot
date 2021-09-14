@@ -22,6 +22,9 @@ export default class App {
 
                     votingController.updateMostVoted()
                         .catch(reject)
+
+                    votingController.initVotingSystem()
+                        .catch(reject)
                 }
             })
         }).catch((err) => this.handleError(err))
