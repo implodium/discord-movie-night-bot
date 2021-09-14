@@ -1,9 +1,14 @@
 import CustomError from "./CustomError";
 
-class UserError extends CustomError {
+export default class UserError extends CustomError {
 
-    public toString(): string {
-        return `❌ ${this.message}`
+    public type: string = 'user'
+    public guildId: string
+    public output: string = `:x: ${this.message}`
+
+    constructor(msg: string, guildId: string) {
+        super(msg);
+        this.guildId = guildId
     }
 
 }
