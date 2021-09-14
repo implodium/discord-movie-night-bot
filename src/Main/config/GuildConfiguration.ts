@@ -4,4 +4,5 @@ export default interface GuildConfiguration {
     id: string,
     votingChannelId: string,
     votingDisplayType: VoteDisplayType,
+    errChannel: string
 }

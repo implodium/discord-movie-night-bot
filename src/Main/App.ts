@@ -1,6 +1,8 @@
 import {inject, injectable} from "inversify";
 import DiscordController from "./control/DiscordController";
 import VotingController from "./control/VotingController";
+import UserError from "./error/UserError"
+import InternalError from "./error/InternalError";
 
 @injectable()
 export default class App {
@@ -14,8 +16,19 @@ export default class App {
             if (user) {
                 console.log(`logged in as ${user.tag}`)
                 votingController.updateMostVoted()
-                    .catch(console.log)
+                    .catch(this.handleError)
             }
         })
+    }
+
+    handleError(err: any) {
+        if(err instanceof UserError) {
+            this.discordController.sendError(err.guildId, err.toString())
+                .catch(this.handleError)
+        } else if (err instanceof InternalError) {
+            console.log(err.toString())
+        } else {
+            console.log(err)
+        }
     }
 }

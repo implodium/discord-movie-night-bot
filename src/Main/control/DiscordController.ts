@@ -10,6 +10,8 @@ import {
     Snowflake,
     TextChannel
 } from "discord.js";
+import GuildConfiguration from "../config/GuildConfiguration";
+import InternalError from "../error/InternalError";
 
 @injectable()
 export default class DiscordController {
@@ -88,6 +90,17 @@ export default class DiscordController {
             } else {
                 reject('reaction => ' + reactionEmoji + ' not found')
             }
+        })
+    }
+
+    sendError(guildId: string, message: string): Promise<void> {
+        const guildConfig: GuildConfiguration = this.configController.getConfig(`guild.${guildId}`)
+
+        return new Promise((resolve, reject) => {
+            this.getChannelOf(guildId, guildConfig.errChannel)
+                .then(channel => channel as TextChannel)
+                .then(textChannel => textChannel.send(message))
+                .catch(err => reject(new InternalError(err.message)))
         })
     }
 }
