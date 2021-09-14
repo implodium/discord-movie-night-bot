@@ -94,13 +94,16 @@ export default class DiscordController {
     }
 
     sendError(guildId: string, message: string): Promise<void> {
-        const guildConfig: GuildConfiguration = this.configController.getConfig(`guild.${guildId}`)
+        const guildConfig: GuildConfiguration = this.configController.getConfig(`guilds.${guildId}`)
 
         return new Promise((resolve, reject) => {
             this.getChannelOf(guildId, guildConfig.errChannel)
                 .then(channel => channel as TextChannel)
-                .then(textChannel => textChannel.send(message))
-                .catch(err => reject(new InternalError(err.message)))
+                .then(textChannel => {
+                    textChannel.send(message)
+                        .then(console.log)
+                })
+                .catch(() => reject(new InternalError("something went wrong with the error handling")))
         })
     }
 }

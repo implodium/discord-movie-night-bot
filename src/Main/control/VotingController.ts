@@ -3,6 +3,7 @@ import DiscordController from "./DiscordController";
 import ConfigController from "./ConfigController";
 import {Client, GuildChannel, TextChannel} from "discord.js";
 import GuildConfiguration from "../config/GuildConfiguration";
+import UserError from "../error/UserError";
 
 @injectable()
 export default class VotingController {
@@ -21,6 +22,8 @@ export default class VotingController {
             const guildConfigs: Record<string, GuildConfiguration> = this.configController.getConfig("guilds")
 
             for (const id in guildConfigs) {
+                reject(new UserError("something went wrong", id))
+
                 this.discordController.getChannelOf(id, guildConfigs[id].votingChannelId)
                     .then(channel => {
                         if (channel.type === "GUILD_TEXT") {

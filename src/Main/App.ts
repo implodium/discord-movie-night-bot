@@ -2,7 +2,6 @@ import {inject, injectable} from "inversify";
 import DiscordController from "./control/DiscordController";
 import VotingController from "./control/VotingController";
 import UserError from "./error/UserError"
-import InternalError from "./error/InternalError";
 
 @injectable()
 export default class App {
@@ -20,17 +19,22 @@ export default class App {
                         .catch(reject)
                 }
             })
-        }).catch(console.log)
+        }).catch((err) => this.handleError(err))
     }
 
     handleError(err: any) {
-        if(err instanceof UserError) {
-            this.discordController.sendError(err.guildId, err.toString())
-                .catch(this.handleError)
-        } else if (err instanceof InternalError) {
-            console.log(err.toString())
+        if(err.type === 'user') {
+            const userError = err as UserError
+            this.discordController.sendError(userError.guildId, userError.output)
+                .catch(err => this.handleError(err))
+
+            console.log(userError.stack)
+        } else if (err.type === 'internal') {
+            console.log(err.output)
+            console.log(err.stack)
         } else {
-            console.log(err)
+            console.log(err.message)
+            console.log(err.stack)
         }
     }
 }
