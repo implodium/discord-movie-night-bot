@@ -21,8 +21,6 @@ export default class VotingController {
             const guildConfigs: Record<string, GuildConfiguration> = this.configController.getConfig("guilds")
 
             for (const id in guildConfigs) {
-                console.log(guildConfigs[id])
-
                 this.discordController.getChannelOf(id, guildConfigs[id].votingChannelId)
                     .then(channel => {
                         if (channel.type === "GUILD_TEXT") {
@@ -50,7 +48,7 @@ export default class VotingController {
                     // console.log(`${basename}-§-${name}`)
                     channel.setName(`${basename}-§-${name}`)
                         .then(() => resolve())
-                        .catch(console.log)
+                        .catch(reject)
                 })
             } else {
                 channel.setName( `${channel.name}: ${reactionResults.size} Winner`)
@@ -98,9 +96,6 @@ export default class VotingController {
             let countOfMostVoted: number | undefined = undefined
 
             countResults.forEach((counts, id) => {
-                console.log(idOfMostVoted === undefined)
-                console.log(countOfMostVoted === undefined)
-
                 if (idOfMostVoted === undefined && countOfMostVoted === undefined) {
                     mostVoted.set(id, counts)
                     idOfMostVoted = id
