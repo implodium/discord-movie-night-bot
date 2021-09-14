@@ -11,14 +11,16 @@ export default class App {
         @inject(DiscordController) private discordController: DiscordController,
         @inject(VotingController) private votingController: VotingController
     ) {
-        discordController.client.on('ready', () => {
-            const user = discordController.client.user
-            if (user) {
-                console.log(`logged in as ${user.tag}`)
-                votingController.updateMostVoted()
-                    .catch(this.handleError)
-            }
-        })
+        new Promise((resolve, reject) => {
+            discordController.client.on('ready', () => {
+                const user = discordController.client.user
+                if (user) {
+                    console.log(`logged in as ${user.tag}`)
+                    votingController.updateMostVoted()
+                        .catch(reject)
+                }
+            })
+        }).catch(console.log)
     }
 
     handleError(err: any) {
