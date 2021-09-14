@@ -33,8 +33,7 @@ export default class App {
             console.log(err.output)
             console.log(err.stack)
         } else {
-            console.log(err.message)
-            console.log(err.stack)
+            console.log(err)
         }
     }
 }
