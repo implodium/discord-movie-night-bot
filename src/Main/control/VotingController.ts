@@ -1,8 +1,10 @@
 import {inject, injectable} from "inversify";
 import DiscordController from "./DiscordController";
 import ConfigController from "./ConfigController";
-import {Client, GuildChannel, TextChannel} from "discord.js";
+import {Client, GuildChannel, Message, TextChannel} from "discord.js";
 import GuildConfiguration from "../config/GuildConfiguration";
+import Logger from "../logger/Logger";
+import UserError from "../error/UserError";
 
 @injectable()
 export default class VotingController {
@@ -11,7 +13,8 @@ export default class VotingController {
 
     constructor(
         @inject(DiscordController) private discordController: DiscordController,
-        @inject(ConfigController) private configController: ConfigController
+        @inject(ConfigController) private configController: ConfigController,
+        @inject(Logger) private logger: Logger
     ) {
         this.discordClient = discordController.client
     }
@@ -118,6 +121,42 @@ export default class VotingController {
                 resolve(mostVoted)
             }
 
+        })
+    }
+
+    initVotingSystem(): Promise<void> {
+        this.logger.info("initializing voting System")
+        const guildConfigs = this.configController.getGuildConfigurations()
+
+        return new Promise((resolve, reject) => {
+            for (const id in guildConfigs) {
+                this.discordController.getChannelOf(id, guildConfigs[id].votingChannelId)
+                    .then(channel => {
+                        if (channel.isText()) {
+                            const textChannel = channel as TextChannel
+                            this.logger.info(`initiating '${textChannel.guild.name}' Guild`)
+                            this.logger.info(`initiating '${textChannel.name}' voting channel`)
+
+                            textChannel.messages.fetch()
+                                .then(snowflakes => snowflakes.forEach(this.makeStandardReactions))
+                                .then(() => this.logger.info('initiated reactions'))
+                                .catch(reject)
+                        } else {
+                            reject(new UserError('wrong configured voting channel', id))
+                        }
+                    })
+                    .catch(reject)
+            }
+        })
+    }
+
+    makeStandardReactions(message: Message): Promise<void> {
+        return new Promise((resolve, reject) => {
+            message.react('👍')
+                .catch(reject)
+
+            message.react('👎')
+                .catch(reject)
         })
     }
 }

@@ -9,7 +9,7 @@ export default class Logger {
 
     constructor() {
         this.log = winston.createLogger({
-            level: 'info',
+            level: 'debug',
             format: winston.format.json(),
             transports: [
 
@@ -25,19 +25,19 @@ export default class Logger {
     }
 
 
-    warn(msg: string) {
+    warn(msg: any) {
         this.log.warn(msg)
     }
 
-    error(msg: string) {
+    error(msg: any) {
         this.log.error(msg)
     }
 
-    debug(msg: string) {
+    debug(msg: any) {
         this.log.debug(msg)
     }
 
-    info(msg: string) {
+    info(msg: any) {
         this.log.info(msg)
     }
 

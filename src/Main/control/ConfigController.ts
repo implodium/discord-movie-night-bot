@@ -1,6 +1,7 @@
 import {injectable} from "inversify";
 import * as dotenv from 'dotenv'
 import Config from "../typings/Config";
+import GuildConfiguration from "../config/GuildConfiguration";
 
 @injectable()
 export default class ConfigController {
@@ -42,5 +43,9 @@ export default class ConfigController {
         } else {
             throw new Error('config not found')
         }
+    }
+
+    getGuildConfigurations(): Record<string, GuildConfiguration> {
+        return this.getConfig('guilds')
     }
 }
