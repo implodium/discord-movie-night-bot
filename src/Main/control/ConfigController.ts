@@ -1,17 +1,19 @@
 import {injectable} from "inversify";
 import * as dotenv from 'dotenv'
-import * as config from "config";
+import Config from "../typings/Config";
 
 @injectable()
 export default class ConfigController {
 
+    private config?: Config
+
     constructor() {
-        this.initDotEnv()
+        ConfigController.initDotEnv()
         this.initNodeConfig()
     }
 
 
-    private initDotEnv() {
+    private static initDotEnv() {
         if (process.env.NODE_ENV && process.env.PWD && process.env.NODE_ENV === 'development') {
             dotenv.config({path: `${process.env.PWD}/config/env/.env.dev`})
         }
@@ -20,15 +22,25 @@ export default class ConfigController {
     private initNodeConfig() {
         if (process.env.NODE_ENV) {
             process.env.NODE_CONFIG_DIR = `${process.cwd()}/config/app`
-            config.util.loadFileConfigs()
+            this.config = require('config')
         }
     }
 
     public debugNodeConfig() {
-        console.log(config.util.getConfigSources())
+        if (this.config) {
+            console.log(this.config.util.getConfigSources())
+        }
     }
 
     getEnv(envString: string) {
         return process.env[envString]
+    }
+
+    getConfig<T>(configPath: string): T {
+        if (this.config) {
+            return this.config.get(configPath)
+        } else {
+            throw new Error('config not found')
+        }
     }
 }
