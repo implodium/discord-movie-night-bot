@@ -17,18 +17,20 @@ export default class VotingDisplayController {
 
     displayVotingResult(votingResult: Map<string, number>, guildConfig: GuildConfiguration): Promise<void> {
         return new Promise((resolve, reject) => {
-
             if(guildConfig && guildConfig.votingDisplayTypes) {
                 for (const displayType of guildConfig.votingDisplayTypes) {
                     switch (displayType) {
                         case VoteDisplayType.CHANNEL_NAME:
                             this.displayChannelName()
+                                .catch(reject)
                             break
                         case VoteDisplayType.CHANNEL_NAME_POSTFIX:
                             this.displayChannelNamePostFix()
+                                .catch(reject)
                             break
                         case VoteDisplayType.CHANNEL_MESSAGE:
                             this.displayChannelMessage()
+                                .catch(reject)
                             break
                     }
                     this.logger.debug(displayType)
