@@ -43,7 +43,7 @@ export default class VotingDisplayController {
 
     private displayChannelName(votingResult: Map<string, number>): Promise<void> {
         return new Promise((resolve, reject) => {
-
+            this.logger.warn("not implemented")
         })
     }
 
@@ -55,7 +55,7 @@ export default class VotingDisplayController {
 
     private displayChannelMessage(votingResult: Map<string, number>): Promise<void> {
         return new Promise((resolve, reject) => {
-
+            this.logger.warn("not implemented")
         })
     }
 }
