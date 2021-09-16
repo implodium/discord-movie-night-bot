@@ -5,6 +5,7 @@ import {Client, GuildChannel, Message, TextChannel} from "discord.js";
 import Logger from "../logger/Logger";
 import UserError from "../error/UserError";
 import GuildConfigurations from "../config/GuildConfigurations";
+import InternalError from "../error/InternalError";
 
 @injectable()
 export default class VotingController {
@@ -24,20 +25,24 @@ export default class VotingController {
             const guildConfigs: GuildConfigurations = this.configController.getConfig("guilds")
 
             for (const [id, guildConfig] of Object.entries(guildConfigs)) {
-                this.discordController.getChannelOf(id, guildConfig.votingChannelId)
-                    .then(channel => {
-                        if (channel.type === "GUILD_TEXT") {
-                            const textChannel = channel as TextChannel
-                            this.countVotes(textChannel)
-                                .then(countResults => this.getMostVoted(countResults))
-                                .then(countResults => this.displayMostVoted(countResults, textChannel))
-                                .then(resolve)
-                                .catch(reject)
-                        } else {
-                            reject("Channel is not text channel please check your config")
-                        }
-                    })
-                    .catch(reject)
+                if (guildConfig.votingChannelId) {
+                    this.discordController.getChannelOf(id, guildConfig.votingChannelId)
+                        .then(channel => {
+                            if (channel.type === "GUILD_TEXT") {
+                                const textChannel = channel as TextChannel
+                                this.countVotes(textChannel)
+                                    .then(countResults => this.getMostVoted(countResults))
+                                    .then(countResults => this.displayMostVoted(countResults, textChannel))
+                                    .then(resolve)
+                                    .catch(reject)
+                            } else {
+                                reject("Channel is not text channel please check your config")
+                            }
+                        })
+                        .catch(reject)
+                } else {
+                    reject(new InternalError("configuration is invalid"))
+                }
             }
         })
 
@@ -95,8 +100,8 @@ export default class VotingController {
     private getMostVoted(countResults: Map<string, number>): Promise<Map<string, number>> {
         return new Promise((resolve, reject) => {
             const mostVoted = new Map<string, number>()
-            let idOfMostVoted: string | undefined;
-            let countOfMostVoted: number | undefined;
+            let idOfMostVoted: string;
+            let countOfMostVoted: number;
 
             countResults.forEach((counts, id) => {
                 if (idOfMostVoted === undefined && countOfMostVoted === undefined) {
@@ -126,26 +131,30 @@ export default class VotingController {
 
     initVotingSystem(): Promise<void> {
         this.logger.info("initializing voting System")
-        const guildConfigs = this.configController.getGuildConfigurations()
+        const guildConfigs: GuildConfigurations = this.configController.getGuildConfigurations()
 
         return new Promise((resolve, reject) => {
-            for (const [id] of Object.entries(guildConfigs)) {
-                this.discordController.getChannelOf(id, guildConfigs[id].votingChannelId)
-                    .then(channel => {
-                        if (channel.isText()) {
-                            const textChannel = channel as TextChannel
-                            this.logger.info(`initiating '${textChannel.guild.name}' Guild`)
-                            this.logger.info(`initiating '${textChannel.name}' voting channel`)
+            for (const [id, guildConfig] of Object.entries(guildConfigs)) {
+                if (guildConfig.votingChannelId) {
+                    this.discordController.getChannelOf(id, guildConfig.votingChannelId)
+                        .then(channel => {
+                            if (channel.isText()) {
+                                const textChannel = channel as TextChannel
+                                this.logger.info(`initiating '${textChannel.guild.name}' Guild`)
+                                this.logger.info(`initiating '${textChannel.name}' voting channel`)
 
-                            textChannel.messages.fetch()
-                                .then(snowflakes => snowflakes.forEach(this.makeStandardReactions))
-                                .then(() => this.logger.info('initiated reactions'))
-                                .catch(reject)
-                        } else {
-                            reject(new UserError('wrong configured voting channel', id))
-                        }
-                    })
-                    .catch(reject)
+                                textChannel.messages.fetch()
+                                    .then(snowflakes => snowflakes.forEach(this.makeStandardReactions))
+                                    .then(() => this.logger.info('initiated reactions'))
+                                    .catch(reject)
+                            } else {
+                                reject(new UserError('wrong configured voting channel', id))
+                            }
+                        })
+                        .catch(reject)
+                } else {
+                    reject(new InternalError("invalied Configuration"))
+                }
             }
         })
     }
