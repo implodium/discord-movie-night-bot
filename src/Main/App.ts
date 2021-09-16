@@ -34,14 +34,14 @@ export default class App {
         if(err.type === 'user') {
             const userError = err as UserError
             this.discordController.sendError(userError.guildId, userError.output)
-                .catch(err => this.handleError(err))
+                .catch(handelErr  => this.handleError(handelErr))
 
-            console.log(userError.stack)
+            this.log.error(userError.stack)
         } else if (err.type === 'internal') {
-            console.log(err.output)
-            console.log(err.stack)
+            this.log.error(err.output)
+            this.log.error(err.stack)
         } else {
-            console.log(err)
+            this.log.error(err.output)
         }
     }
 }

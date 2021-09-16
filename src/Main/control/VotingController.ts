@@ -2,9 +2,9 @@ import {inject, injectable} from "inversify";
 import DiscordController from "./DiscordController";
 import ConfigController from "./ConfigController";
 import {Client, GuildChannel, Message, TextChannel} from "discord.js";
-import GuildConfiguration from "../config/GuildConfiguration";
 import Logger from "../logger/Logger";
 import UserError from "../error/UserError";
+import GuildConfigurations from "../config/GuildConfigurations";
 
 @injectable()
 export default class VotingController {
@@ -21,10 +21,10 @@ export default class VotingController {
 
     async updateMostVoted(): Promise<void>{
         return new Promise((resolve, reject) => {
-            const guildConfigs: Record<string, GuildConfiguration> = this.configController.getConfig("guilds")
+            const guildConfigs: GuildConfigurations = this.configController.getConfig("guilds")
 
-            for (const id in guildConfigs) {
-                this.discordController.getChannelOf(id, guildConfigs[id].votingChannelId)
+            for (const [id, guildConfig] of Object.entries(guildConfigs)) {
+                this.discordController.getChannelOf(id, guildConfig.votingChannelId)
                     .then(channel => {
                         if (channel.type === "GUILD_TEXT") {
                             const textChannel = channel as TextChannel
@@ -47,7 +47,7 @@ export default class VotingController {
         return new Promise((resolve, reject) => {
             if (reactionResults.size === 1) {
                 reactionResults.forEach((counts, name) => {
-                    let basename = channel.name.split('§')[0];
+                    const basename = channel.name.split('§')[0];
                     // console.log(`${basename}-§-${name}`)
                     channel.setName(`${basename}-§-${name}`)
                         .then(() => resolve())
@@ -95,8 +95,8 @@ export default class VotingController {
     private getMostVoted(countResults: Map<string, number>): Promise<Map<string, number>> {
         return new Promise((resolve, reject) => {
             const mostVoted = new Map<string, number>()
-            let idOfMostVoted: string | undefined = undefined
-            let countOfMostVoted: number | undefined = undefined
+            let idOfMostVoted: string | undefined;
+            let countOfMostVoted: number | undefined;
 
             countResults.forEach((counts, id) => {
                 if (idOfMostVoted === undefined && countOfMostVoted === undefined) {
@@ -129,7 +129,7 @@ export default class VotingController {
         const guildConfigs = this.configController.getGuildConfigurations()
 
         return new Promise((resolve, reject) => {
-            for (const id in guildConfigs) {
+            for (const [id] of Object.entries(guildConfigs)) {
                 this.discordController.getChannelOf(id, guildConfigs[id].votingChannelId)
                     .then(channel => {
                         if (channel.isText()) {
