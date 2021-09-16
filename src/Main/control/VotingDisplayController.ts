@@ -3,6 +3,7 @@ import ConfigController from "./ConfigController";
 import InternalError from "../error/InternalError";
 import Logger from "../logger/Logger";
 import GuildConfiguration from "../config/GuildConfiguration";
+import {VoteDisplayType} from "../util/VoteDisplayType";
 
 @injectable()
 export default class VotingDisplayController {
@@ -19,6 +20,17 @@ export default class VotingDisplayController {
 
             if(guildConfig && guildConfig.votingDisplayTypes) {
                 for (const displayType of guildConfig.votingDisplayTypes) {
+                    switch (displayType) {
+                        case VoteDisplayType.CHANNEL_NAME:
+                            this.displayChannelName()
+                            break
+                        case VoteDisplayType.CHANNEL_NAME_POSTFIX:
+                            this.displayChannelNamePostFix()
+                            break
+                        case VoteDisplayType.CHANNEL_MESSAGE:
+                            this.displayChannelMessage()
+                            break
+                    }
                     this.logger.debug(displayType)
                 }
             } else {
@@ -27,4 +39,21 @@ export default class VotingDisplayController {
         })
     }
 
+    private displayChannelName(): Promise<void> {
+        return new Promise((resolve, reject) => {
+
+        })
+    }
+
+    private displayChannelNamePostFix(): Promise<void> {
+        return new Promise((resolve, reject) => {
+
+        })
+    }
+
+    private displayChannelMessage(): Promise<void> {
+        return new Promise((resolve, reject) => {
+
+        })
+    }
 }
