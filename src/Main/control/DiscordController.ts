@@ -12,6 +12,7 @@ import {
 } from "discord.js";
 import GuildConfiguration from "../config/GuildConfiguration";
 import InternalError from "../error/InternalError";
+import Logger from "../logger/Logger";
 
 @injectable()
 export default class DiscordController {
@@ -19,7 +20,8 @@ export default class DiscordController {
     private readonly _client: Client
 
     constructor(
-        @inject(ConfigController) private configController: ConfigController
+        @inject(ConfigController) private configController: ConfigController,
+        @inject(Logger) private logger: Logger
     ) {
         this._client = new Client({ intents: Intents.FLAGS.GUILDS })
         this.init()
@@ -30,7 +32,7 @@ export default class DiscordController {
 
         if (token) {
             this._client.login(token)
-                .catch(console.log)
+                .catch(this.logger.error)
         } else {
             throw new Error("No Token present")
         }
@@ -81,8 +83,8 @@ export default class DiscordController {
 
     count(reactionEmoji: string, of: Message): Promise<number> {
         return new Promise((resolve, reject) => {
-            const reaction = of.reactions.valueOf().filter(reaction => {
-                return reaction.emoji.name === reactionEmoji
+            const reaction = of.reactions.valueOf().filter(reactionEntry => {
+                return reactionEntry.emoji.name === reactionEmoji
             }).first()
 
             if (reaction) {
@@ -97,13 +99,18 @@ export default class DiscordController {
         const guildConfig: GuildConfiguration = this.configController.getConfig(`guilds.${guildId}`)
 
         return new Promise((resolve, reject) => {
-            this.getChannelOf(guildId, guildConfig.errChannel)
-                .then(channel => channel as TextChannel)
-                .then(textChannel => {
-                    textChannel.send(message)
-                        .then(console.log)
-                })
-                .catch(() => reject(new InternalError("something went wrong with the error handling")))
+            if (guildConfig.errChannel) {
+                this.getChannelOf(guildId, guildConfig.errChannel)
+                    .then(channel => channel as TextChannel)
+                    .then(textChannel => {
+                        textChannel.send(message)
+                            .then(reject)
+                    })
+                    .catch(() => reject(new InternalError("something went wrong with the error handling")))
+
+            } else {
+                reject(new InternalError("invalid configuration"))
+            }
         })
     }
 }

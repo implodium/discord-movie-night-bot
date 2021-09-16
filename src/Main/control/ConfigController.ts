@@ -1,14 +1,17 @@
-import {injectable} from "inversify";
+import {inject, injectable} from "inversify";
 import * as dotenv from 'dotenv'
 import Config from "../typings/Config";
-import GuildConfiguration from "../config/GuildConfiguration";
+import Logger from "../logger/Logger";
+import GuildConfigurations from "../config/GuildConfigurations";
 
 @injectable()
 export default class ConfigController {
 
     private config?: Config
 
-    constructor() {
+    constructor(
+        @inject(Logger) private logger: Logger
+    ) {
         ConfigController.initDotEnv()
         this.initNodeConfig()
     }
@@ -29,7 +32,7 @@ export default class ConfigController {
 
     public debugNodeConfig() {
         if (this.config) {
-            console.log(this.config.util.getConfigSources())
+            this.logger.debug(this.config.util.getConfigSources())
         }
     }
 
@@ -45,7 +48,7 @@ export default class ConfigController {
         }
     }
 
-    getGuildConfigurations(): Record<string, GuildConfiguration> {
+    getGuildConfigurations(): GuildConfigurations {
         return this.getConfig('guilds')
     }
 }

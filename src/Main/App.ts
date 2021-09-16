@@ -31,17 +31,21 @@ export default class App {
     }
 
     handleError(err: any) {
-        if(err.type === 'user') {
-            const userError = err as UserError
-            this.discordController.sendError(userError.guildId, userError.output)
-                .catch(err => this.handleError(err))
+        if (err !== undefined) {
 
-            console.log(userError.stack)
-        } else if (err.type === 'internal') {
-            console.log(err.output)
-            console.log(err.stack)
-        } else {
-            console.log(err)
+            if(err.type === 'user') {
+                const userError = err as UserError
+                this.discordController.sendError(userError.guildId, userError.output)
+                    .catch(handelErr  => this.handleError(handelErr))
+
+                this.log.error(userError.stack)
+            } else if (err.type === 'internal') {
+                this.log.error(err.output)
+                this.log.error(err.stack)
+            } else {
+                this.log.error(err.stack)
+            }
         }
+
     }
 }
