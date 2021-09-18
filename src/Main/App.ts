@@ -40,6 +40,7 @@ export default class App {
         this.log.info("Starting up ...")
         new Promise((resolve, reject) => {
             this.discordController.client.on('ready', () => {
+                this.eventController.initEvents()
                 const user = this.discordController.client.user
                 if (user) {
                     this.log.info(`logged in as ${user.tag}`)
@@ -47,7 +48,6 @@ export default class App {
                         .catch(reject)
 
                     this.votingController.initVotingSystem()
-                        .then(() => this.eventController.initEvents())
                         .catch(reject)
                 }
             })
