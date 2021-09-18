@@ -18,29 +18,23 @@ export default class EventController {
     }
 
     initEvents() {
-        this.logger.debug("initializing Events")
+        this.logger.info("initiated events")
         const init = new Array<Promise<void>>()
 
         this.discordClient.on('guildCreate', () => {
             init.push(this.votingController.initVotingSystem())
         })
 
-        this.discordClient.on('messageCreate', (message) => {
-            this.logger.debug(message.content)
-        })
-
         this.discordClient.on('messageReactionAdd', (reaction, user) => {
             if (this.discordClient.user && user.id !== this.discordClient.user.id) {
                 init.push(this.votingController.updateMostVoted())
             }
-            // init.push(this.votingController.updateMostVoted())
         })
 
         this.discordClient.on('messageReactionRemove', (reaction, user) => {
             if (this.discordClient.user && user.id !== this.discordClient.user.id) {
                 init.push(this.votingController.updateMostVoted())
             }
-            // init.push(this.votingController.updateMostVoted())
         })
 
     }

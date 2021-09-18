@@ -165,7 +165,6 @@ export default class VotingController {
     }
 
     makeStandardReactions(message: Message): Promise<void> {
-        this.logger.debug("making reaction")
         return new Promise((resolve, reject) => {
             message.react('👍')
                 .catch(reject)
