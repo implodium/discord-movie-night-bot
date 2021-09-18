@@ -5,5 +5,5 @@ export default interface GuildConfiguration {
     id?: string,
     votingChannelId?: string,
     errChannel?: string
-    winningChannel?: string
+    winningChannelId?: string
 }

@@ -4,7 +4,8 @@
       "id": "616401731269689347",
       "votingChannelId": "886284711561928794",
       "errChannel": "727446914789802035",
-      "votingDisplayTypes": ["CHANNEL_NAME_POSTFIX"]
+      "winningChannelId": "888384291690643528",
+      "votingDisplayTypes": ["CHANNEL_NAME_POSTFIX", "CHANNEL_NAME"]
     }
   }
 }

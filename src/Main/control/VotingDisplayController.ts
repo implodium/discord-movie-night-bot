@@ -46,7 +46,26 @@ export default class VotingDisplayController {
 
     private displayChannelName(votingResult: Map<string, number>, guildConfig: GuildConfiguration): Promise<void> {
         return new Promise((resolve, reject) => {
-            this.logger.warn("not implemented")
+            this.logger.info('displaying ChannelName')
+
+            if (guildConfig.winningChannelId && guildConfig.id) {
+                this.discordController.getChannelOf(guildConfig.id, guildConfig.winningChannelId)
+                    .then(anyChannel => anyChannel as GuildChannel)
+                    .then(guildChannel => {
+                        if (votingResult.size > 1) {
+                            guildChannel.setName(`${votingResult.size} winner`)
+                        } else {
+                            let first = true
+
+                            votingResult.forEach((count, name) => {
+                                if (first) {
+                                    guildChannel.setName(`${name}`)
+                                    first = false
+                                }
+                            })
+                        }
+                    })
+            }
         })
     }
 
