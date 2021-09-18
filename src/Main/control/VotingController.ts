@@ -24,6 +24,7 @@ export default class VotingController {
 
     async updateMostVoted(): Promise<void>{
         return new Promise((resolve, reject) => {
+            this.logger.info("updating most voted")
             const guildConfigs: GuildConfigurations = this.configController.getConfig("guilds")
 
             for (const [id, guildConfig] of Object.entries(guildConfigs)) {
@@ -147,8 +148,9 @@ export default class VotingController {
                                 this.logger.info(`initiating '${textChannel.name}' voting channel`)
 
                                 textChannel.messages.fetch()
-                                    .then(snowflakes => snowflakes.forEach(this.makeStandardReactions))
+                                    .then(snowflakes => snowflakes.forEach(message => this.makeStandardReactions(message)))
                                     .then(() => this.logger.info('initiated reactions'))
+                                    .then(() => resolve())
                                     .catch(reject)
                             } else {
                                 reject(new UserError('wrong configured voting channel', id))
@@ -163,6 +165,7 @@ export default class VotingController {
     }
 
     makeStandardReactions(message: Message): Promise<void> {
+        this.logger.debug("making reaction")
         return new Promise((resolve, reject) => {
             message.react('👍')
                 .catch(reject)
