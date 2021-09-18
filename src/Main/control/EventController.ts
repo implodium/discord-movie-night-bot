@@ -63,8 +63,6 @@ export default class EventController {
         ) {
             this.votingController.updateMostVoted()
                 .catch(this._errors.next)
-        } else {
-            this.logger.debug("blocked")
         }
     }
 }
