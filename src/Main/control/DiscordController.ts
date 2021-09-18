@@ -4,7 +4,7 @@ import {
     Channel,
     Client,
     Collection,
-    Guild,
+    Guild, GuildChannel,
     Intents,
     Message,
     Snowflake,
@@ -111,6 +111,16 @@ export default class DiscordController {
             } else {
                 reject(new InternalError("invalid configuration"))
             }
+        })
+    }
+
+    getMessageOf(channel: TextChannel, messageId: string): Promise<Message> {
+        return new Promise((resolve, reject) => {
+            channel.messages.fetch(messageId)
+                .then(message => {
+                    resolve(message)
+                })
+                .catch(reject)
         })
     }
 }

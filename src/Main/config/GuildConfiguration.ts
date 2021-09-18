@@ -1,8 +1,10 @@
 import {VoteDisplayType} from "../util/VoteDisplayType";
 
 export default interface GuildConfiguration {
+    votingDisplayTypes?: [VoteDisplayType];
     id?: string,
     votingChannelId?: string,
-    votingDisplayType?: VoteDisplayType,
     errChannel?: string
+    winningChannelId?: string
+    winningMessageId?: string
 }

@@ -6,6 +6,7 @@ import Logger from "../logger/Logger";
 import UserError from "../error/UserError";
 import GuildConfigurations from "../config/GuildConfigurations";
 import InternalError from "../error/InternalError";
+import VotingDisplayController from "./VotingDisplayController";
 
 @injectable()
 export default class VotingController {
@@ -15,6 +16,7 @@ export default class VotingController {
     constructor(
         @inject(DiscordController) private discordController: DiscordController,
         @inject(ConfigController) private configController: ConfigController,
+        @inject(VotingDisplayController) private displayController: VotingDisplayController,
         @inject(Logger) private logger: Logger
     ) {
         this.discordClient = discordController.client
@@ -32,7 +34,8 @@ export default class VotingController {
                                 const textChannel = channel as TextChannel
                                 this.countVotes(textChannel)
                                     .then(countResults => this.getMostVoted(countResults))
-                                    .then(countResults => this.displayMostVoted(countResults, textChannel))
+                                    .then(votingResults => this.displayController.displayVotingResult(votingResults, guildConfig))
+                                    // .then(countResults => this.displayMostVoted(countResults, textChannel))
                                     .then(resolve)
                                     .catch(reject)
                             } else {

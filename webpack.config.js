@@ -42,6 +42,9 @@ const config = {
             module: /config/
         }
     ],
+    watchOptions: {
+        ignored: /data/,
+    }
 };
 
 module.exports = () => {
