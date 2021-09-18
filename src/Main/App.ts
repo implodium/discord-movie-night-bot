@@ -4,6 +4,7 @@ import VotingController from "./control/VotingController";
 import UserError from "./error/UserError"
 import Logger from "./logger/Logger";
 import EventController from "./control/EventController";
+import AnnouncementController from "./control/AnnouncementController";
 
 @injectable()
 export default class App {
@@ -12,6 +13,7 @@ export default class App {
         @inject(DiscordController) private discordController: DiscordController,
         @inject(VotingController) private votingController: VotingController,
         @inject(EventController) private eventController: EventController,
+        @inject(AnnouncementController) private announcementController: AnnouncementController,
         @inject(Logger) private log: Logger
     ) {
         this.init()
@@ -41,6 +43,7 @@ export default class App {
         new Promise((resolve, reject) => {
             this.discordController.client.on('ready', () => {
                 this.eventController.initEvents()
+                this.announcementController.init()
                 this.eventController.errors
                     .subscribe(this.handleError)
                 const user = this.discordController.client.user
