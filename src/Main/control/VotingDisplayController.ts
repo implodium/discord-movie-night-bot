@@ -56,6 +56,8 @@ export default class VotingDisplayController {
                     .then(guildChannel => {
                         if (votingResult.size > 1) {
                             guildChannel.setName(`${votingResult.size} winner`)
+                                .then(() => resolve())
+                                .catch(reject)
                         } else {
                             let first = true
 
@@ -114,6 +116,8 @@ export default class VotingDisplayController {
                                     if (storage.winnerMessageId) {
                                         this.logger.info("updating message")
                                         this.updateDisplayMessage(winningTextChannel, storage.winnerMessageId, votingResult)
+                                            .then(() => resolve())
+                                            .catch(reject)
                                     } else {
                                         this.logger.info("sending message")
                                         this.sendDisplayMessage(winningTextChannel, votingResult)
@@ -128,7 +132,7 @@ export default class VotingDisplayController {
         })
     }
 
-    private sendDisplayMessage(textChannel: TextChannel, votingResult: Map<string, number>) {
+    private sendDisplayMessage(textChannel: TextChannel, votingResult: Map<string, number>): Promise<void> {
         return new Promise((resolve, reject) => {
             textChannel.send({embeds: [this.getEmbed(votingResult)]})
                 .then(message => {
@@ -136,7 +140,7 @@ export default class VotingDisplayController {
                     this.storageController.write({
                         winnerMessageId: message.id
                     })
-                        .then(resolve)
+                        .then(() => resolve())
                         .catch(reject)
                 })
                 .catch(reject)
@@ -144,11 +148,13 @@ export default class VotingDisplayController {
         })
     }
 
-    private updateDisplayMessage(textChannel: TextChannel, messageId: string, votingResult: Map<string, number>) {
+    private updateDisplayMessage(textChannel: TextChannel, messageId: string, votingResult: Map<string, number>): Promise<void> {
         return new Promise<void>((resolve, reject) => {
             this.discordController.getMessageOf(textChannel, messageId)
                 .then(message => {
                     message.edit({embeds: [this.getEmbed(votingResult)]})
+                        .then(() => resolve())
+                        .catch(reject)
                     resolve()
                 })
                 .catch(reject)
