@@ -41,6 +41,11 @@ export default class EventController {
             }
         })
 
+        this.discordClient.on('messageCreate', (message) => {
+            this.votingController.makeStandardReactions(message)
+                .catch(this._errors.next)
+        })
+
     }
 
     get errors(): Observable<any> {
