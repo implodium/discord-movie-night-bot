@@ -3,11 +3,13 @@ import DiscordController from "./DiscordController";
 import VotingController from "./VotingController";
 import {Client} from "discord.js";
 import Logger from "../logger/Logger";
+import {Observable, Subject} from "rxjs";
 
 @injectable()
 export default class EventController {
 
     private discordClient: Client
+    private _errors = new Subject<any>()
 
     constructor(
         @inject(DiscordController) private discordController: DiscordController,
@@ -19,23 +21,29 @@ export default class EventController {
 
     initEvents() {
         this.logger.info("initiated events")
-        const init = new Array<Promise<void>>()
 
         this.discordClient.on('guildCreate', () => {
-            init.push(this.votingController.initVotingSystem())
+            this.votingController.initVotingSystem()
+                .catch(this._errors.next)
         })
 
         this.discordClient.on('messageReactionAdd', (reaction, user) => {
             if (this.discordClient.user && user.id !== this.discordClient.user.id) {
-                init.push(this.votingController.updateMostVoted())
+                this.votingController.updateMostVoted()
+                    .catch(this._errors.next)
             }
         })
 
         this.discordClient.on('messageReactionRemove', (reaction, user) => {
             if (this.discordClient.user && user.id !== this.discordClient.user.id) {
-                init.push(this.votingController.updateMostVoted())
+                this.votingController.updateMostVoted()
+                    .catch(this._errors.next)
             }
         })
 
+    }
+
+    get errors(): Observable<any> {
+        return this._errors
     }
 }
