@@ -22,7 +22,13 @@ export default class StorageController {
                         if (err) {
                             reject(err)
                         } else {
-                            resolve(JSON.parse(data))
+                            let json: Storage
+                            try {
+                                json = JSON.parse(data);
+                            } catch {
+                                json = {}
+                            }
+                            resolve(json)
                         }
                     })
                 })
