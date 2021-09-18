@@ -7,7 +7,7 @@
       "errChannel": "727446914789802035",
       "winningChannelId": "888384291690643528",
       "winningMessageId": "888660493777137664",
-      "votingDisplayTypes": ["CHANNEL_NAME_POSTFIX", "CHANNEL_NAME", "CHANNEL_MESSAGE"]
+      "votingDisplayTypes": ["CHANNEL_MESSAGE"]
     }
   }
 }

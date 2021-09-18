@@ -4,7 +4,7 @@ import {
     Channel,
     Client,
     Collection,
-    Guild, GuildChannel,
+    Guild,
     Intents,
     Message,
     Snowflake,
@@ -23,7 +23,14 @@ export default class DiscordController {
         @inject(ConfigController) private configController: ConfigController,
         @inject(Logger) private logger: Logger
     ) {
-        this._client = new Client({ intents: Intents.FLAGS.GUILDS })
+        this._client = new Client({
+            intents: [
+                Intents.FLAGS.GUILDS,
+                Intents.FLAGS.GUILD_MESSAGES,
+                Intents.FLAGS.GUILD_MESSAGE_REACTIONS,
+            ]
+        })
+
         this.init()
     }
 

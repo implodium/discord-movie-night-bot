@@ -1,7 +1,7 @@
 import {inject, injectable} from "inversify";
 import DiscordController from "./DiscordController";
 import ConfigController from "./ConfigController";
-import {Client, GuildChannel, Message, TextChannel} from "discord.js";
+import {Client, Guild, GuildChannel, Message, TextChannel} from "discord.js";
 import Logger from "../logger/Logger";
 import UserError from "../error/UserError";
 import GuildConfigurations from "../config/GuildConfigurations";
@@ -24,6 +24,7 @@ export default class VotingController {
 
     async updateMostVoted(): Promise<void>{
         return new Promise((resolve, reject) => {
+            this.logger.info("updating most voted")
             const guildConfigs: GuildConfigurations = this.configController.getConfig("guilds")
 
             for (const [id, guildConfig] of Object.entries(guildConfigs)) {
@@ -147,8 +148,9 @@ export default class VotingController {
                                 this.logger.info(`initiating '${textChannel.name}' voting channel`)
 
                                 textChannel.messages.fetch()
-                                    .then(snowflakes => snowflakes.forEach(this.makeStandardReactions))
+                                    .then(snowflakes => snowflakes.forEach(message => this.makeStandardReactions(message)))
                                     .then(() => this.logger.info('initiated reactions'))
+                                    .then(() => resolve())
                                     .catch(reject)
                             } else {
                                 reject(new UserError('wrong configured voting channel', id))
@@ -170,5 +172,11 @@ export default class VotingController {
             message.react('👎')
                 .catch(reject)
         })
+    }
+
+    isVotingChannel(channel: TextChannel, guild: Guild): boolean {
+        const votingChannelId = this.configController.getConfig(`guilds.${guild.id}.votingChannelId`)
+
+        return channel.id === votingChannelId
     }
 }

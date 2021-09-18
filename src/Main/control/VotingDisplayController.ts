@@ -38,7 +38,6 @@ export default class VotingDisplayController {
                                 .catch(reject)
                             break
                     }
-                    this.logger.debug(displayType)
                 }
             } else {
                 reject(new InternalError("configuration not valid"))
@@ -91,6 +90,8 @@ export default class VotingDisplayController {
     }
 
     private displayChannelMessage(votingResult: Map<string, number>, guildConfig: GuildConfiguration): Promise<void> {
+        this.logger.info('displaying ChannelMessage')
+
         return new Promise((resolve, reject) => {
             if (
                 guildConfig.id &&
@@ -136,7 +137,6 @@ export default class VotingDisplayController {
         return new Promise((resolve, reject) => {
             textChannel.send({embeds: [this.getEmbed(votingResult)]})
                 .then(message => {
-                    this.logger.debug(message)
                     this.storageController.write({
                         winnerMessageId: message.id
                     })
@@ -217,7 +217,6 @@ export default class VotingDisplayController {
     private displayChannelNamePostFixIn(channel: GuildChannel, votingResult: Map<string, number>): Promise<void> {
         return new Promise((resolve, reject) => {
             const basename = VotingDisplayController.getBaseName(channel.name)
-            this.logger.debug(basename)
             let first = true
 
             if (votingResult.size === 1) {
@@ -229,15 +228,11 @@ export default class VotingDisplayController {
 
                         first = false
                     }
-
-                    this.logger.debug(`${basename}-§-${name}`);
                 })
             } else {
                 channel.setName( `${basename}-§-${votingResult.size}-winner`)
                     .then(() => resolve())
                     .catch(reject)
-
-                this.logger.debug(`${basename}-§-${votingResult.size} Winner`);
             }
         })
     }

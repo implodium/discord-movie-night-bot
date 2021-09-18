@@ -3,6 +3,7 @@ import DiscordController from "./control/DiscordController";
 import VotingController from "./control/VotingController";
 import UserError from "./error/UserError"
 import Logger from "./logger/Logger";
+import EventController from "./control/EventController";
 
 @injectable()
 export default class App {
@@ -10,24 +11,10 @@ export default class App {
     public constructor(
         @inject(DiscordController) private discordController: DiscordController,
         @inject(VotingController) private votingController: VotingController,
+        @inject(EventController) private eventController: EventController,
         @inject(Logger) private log: Logger
     ) {
-        log.info("Starting up ...")
-
-        new Promise((resolve, reject) => {
-            discordController.client.on('ready', () => {
-                const user = discordController.client.user
-                if (user) {
-                    log.info(`logged in as ${user.tag}`)
-
-                    votingController.updateMostVoted()
-                        .catch(reject)
-
-                    votingController.initVotingSystem()
-                        .catch(reject)
-                }
-            })
-        }).catch((err) => this.handleError(err))
+        this.init()
     }
 
     handleError(err: any) {
@@ -47,5 +34,25 @@ export default class App {
             }
         }
 
+    }
+
+    init() {
+        this.log.info("Starting up ...")
+        new Promise((resolve, reject) => {
+            this.discordController.client.on('ready', () => {
+                this.eventController.initEvents()
+                this.eventController.errors
+                    .subscribe(this.handleError)
+                const user = this.discordController.client.user
+                if (user) {
+                    this.log.info(`logged in as ${user.tag}`)
+                    this.votingController.updateMostVoted()
+                        .catch(reject)
+
+                    this.votingController.initVotingSystem()
+                        .catch(reject)
+                }
+            })
+        }).catch((err) => this.handleError(err))
     }
 }
