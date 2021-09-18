@@ -1,7 +1,7 @@
 import {inject, injectable} from "inversify";
 import DiscordController from "./DiscordController";
 import VotingController from "./VotingController";
-import {Client} from "discord.js";
+import {Client, MessageReaction, PartialMessageReaction, PartialUser, TextChannel, User} from "discord.js";
 import Logger from "../logger/Logger";
 import {Observable, Subject} from "rxjs";
 
@@ -28,17 +28,11 @@ export default class EventController {
         })
 
         this.discordClient.on('messageReactionAdd', (reaction, user) => {
-            if (this.discordClient.user && user.id !== this.discordClient.user.id) {
-                this.votingController.updateMostVoted()
-                    .catch(this._errors.next)
-            }
+            this.reactionUpdate(reaction, user)
         })
 
         this.discordClient.on('messageReactionRemove', (reaction, user) => {
-            if (this.discordClient.user && user.id !== this.discordClient.user.id) {
-                this.votingController.updateMostVoted()
-                    .catch(this._errors.next)
-            }
+            this.reactionUpdate(reaction, user)
         })
 
         this.discordClient.on('messageCreate', (message) => {
@@ -50,5 +44,22 @@ export default class EventController {
 
     get errors(): Observable<any> {
         return this._errors
+    }
+
+    private reactionUpdate(reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) {
+        const channel = reaction.message.channel as TextChannel
+        const guild = channel.guild
+
+        if (this.votingController.isVotingChannel(channel, guild)
+            && this.discordClient.user
+            && user.id !== this.discordClient.user.id
+            && reaction.emoji.name
+            && ['👍', '👎'].includes(reaction.emoji.name)
+        ) {
+            this.votingController.updateMostVoted()
+                .catch(this._errors.next)
+        } else {
+            this.logger.debug("blocked")
+        }
     }
 }

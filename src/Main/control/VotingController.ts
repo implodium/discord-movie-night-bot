@@ -1,7 +1,7 @@
 import {inject, injectable} from "inversify";
 import DiscordController from "./DiscordController";
 import ConfigController from "./ConfigController";
-import {Client, GuildChannel, Message, TextChannel} from "discord.js";
+import {Client, Guild, GuildChannel, Message, TextChannel} from "discord.js";
 import Logger from "../logger/Logger";
 import UserError from "../error/UserError";
 import GuildConfigurations from "../config/GuildConfigurations";
@@ -172,5 +172,11 @@ export default class VotingController {
             message.react('👎')
                 .catch(reject)
         })
+    }
+
+    isVotingChannel(channel: TextChannel, guild: Guild): boolean {
+        const votingChannelId = this.configController.getConfig(`guilds.${guild.id}.votingChannelId`)
+
+        return channel.id === votingChannelId
     }
 }
