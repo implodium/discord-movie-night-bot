@@ -8,6 +8,7 @@
       "winningChannelId": "888384291690643528",
       "winningMessageId": "888660493777137664",
       "cinemaChannel": "888834356095901757",
+      "announcementChannel": "888660493777137664",
       "votingDisplayTypes": ["CHANNEL_MESSAGE"]
     }
   },
