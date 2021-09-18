@@ -5,7 +5,9 @@ import Logger from "../logger/Logger";
 import GuildConfiguration from "../config/GuildConfiguration";
 import {VoteDisplayType} from "../util/VoteDisplayType";
 import DiscordController from "./DiscordController";
-import {GuildChannel} from "discord.js";
+import {GuildChannel, Message, MessageEmbed, TextChannel} from "discord.js";
+import StorageController from "./StorageController";
+import Storage from "../data/Storage";
 
 @injectable()
 export default class VotingDisplayController {
@@ -13,7 +15,8 @@ export default class VotingDisplayController {
     constructor(
         @inject(ConfigController) private configController: ConfigController,
         @inject(Logger) private logger: Logger,
-        @inject(DiscordController) private discordController: DiscordController
+        @inject(DiscordController) private discordController: DiscordController,
+        @inject(StorageController) private storageController: StorageController
     ) {
     }
 
@@ -60,6 +63,8 @@ export default class VotingDisplayController {
                             votingResult.forEach((count, name) => {
                                 if (first) {
                                     guildChannel.setName(`${name}`)
+                                        .then(() => resolve())
+                                        .catch(reject)
                                     first = false
                                 }
                             })
@@ -86,7 +91,70 @@ export default class VotingDisplayController {
 
     private displayChannelMessage(votingResult: Map<string, number>, guildConfig: GuildConfiguration): Promise<void> {
         return new Promise((resolve, reject) => {
-            this.logger.warn("not implemented")
+            if (
+                guildConfig.id &&
+                guildConfig.winningChannelId &&
+                guildConfig.id
+            ) {
+                this.discordController.getChannelOf(guildConfig.id, guildConfig.winningChannelId)
+                    .then(winningChannel => {
+                        if (winningChannel.isText()) {
+                            return winningChannel as TextChannel
+                        } else {
+                            reject(new InternalError(
+                                "winning channel is required to" +
+                                " be a text channel when display" +
+                                " type CHANNEL_MESSAGE is included"
+                            ))
+                        }
+                    })
+                    .then(winningTextChannel => {
+                        if (winningTextChannel) {
+                            this.storageController.get()
+                                .then(storage => {
+                                    if (storage.winnerMessageId) {
+                                        this.logger.info("updating message")
+                                        this.updateDisplayMessage(winningTextChannel)
+                                    } else {
+                                        this.logger.info("sending message")
+                                        this.sendDisplayMessage(winningTextChannel)
+                                            .then(() => resolve)
+                                            .catch(reject)
+                                    }
+                                })
+                        }
+                    })
+                    .catch(reject)
+            }
+        })
+    }
+
+    sendDisplayMessage(textChannel: TextChannel) {
+        return new Promise((resolve, reject) => {
+            textChannel.send({embeds: [this.embed]})
+                .then(message => {
+                    this.logger.debug(message)
+                    this.storageController.write({
+                        winnerMessageId: message.id
+                    })
+                        .then(resolve)
+                        .catch(reject)
+                })
+                .catch(reject)
+
+        })
+    }
+
+    private updateDisplayMessage(textChannel: TextChannel) {
+
+    }
+
+    get embed(): MessageEmbed {
+        return new MessageEmbed({
+            title: 'Most voted movie',
+            description: "movies",
+            color: 'RED',
+            createdAt: new Date()
         })
     }
 

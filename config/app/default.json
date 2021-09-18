@@ -1,11 +1,13 @@
 {
+  "storageFileLocation": "data/storage.json",
   "guilds": {
     "616401731269689347": {
       "id": "616401731269689347",
       "votingChannelId": "886284711561928794",
       "errChannel": "727446914789802035",
       "winningChannelId": "888384291690643528",
-      "votingDisplayTypes": ["CHANNEL_NAME_POSTFIX", "CHANNEL_NAME"]
+      "winningMessageId": "888660493777137664",
+      "votingDisplayTypes": ["CHANNEL_NAME_POSTFIX", "CHANNEL_NAME", "CHANNEL_MESSAGE"]
     }
   }
 }
