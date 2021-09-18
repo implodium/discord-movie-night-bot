@@ -36,8 +36,13 @@ export default class EventController {
         })
 
         this.discordClient.on('messageCreate', (message) => {
-            this.votingController.makeStandardReactions(message)
-                .catch(this._errors.next)
+            const channel = message.channel as TextChannel
+            const guild = channel.guild
+
+            if (this.votingController.isVotingChannel(channel, guild)) {
+                this.votingController.makeStandardReactions(message)
+                    .catch(this._errors.next)
+            }
         })
 
     }
