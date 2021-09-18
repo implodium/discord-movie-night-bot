@@ -116,7 +116,7 @@ export default class VotingDisplayController {
                                         this.updateDisplayMessage(winningTextChannel, storage.winnerMessageId, votingResult)
                                     } else {
                                         this.logger.info("sending message")
-                                        this.sendDisplayMessage(winningTextChannel)
+                                        this.sendDisplayMessage(winningTextChannel, votingResult)
                                             .then(() => resolve)
                                             .catch(reject)
                                     }
@@ -128,9 +128,9 @@ export default class VotingDisplayController {
         })
     }
 
-    sendDisplayMessage(textChannel: TextChannel) {
+    private sendDisplayMessage(textChannel: TextChannel, votingResult: Map<string, number>) {
         return new Promise((resolve, reject) => {
-            textChannel.send({embeds: [this.embed]})
+            textChannel.send({embeds: [this.getEmbed(votingResult)]})
                 .then(message => {
                     this.logger.debug(message)
                     this.storageController.write({
@@ -152,15 +152,6 @@ export default class VotingDisplayController {
                     resolve()
                 })
                 .catch(reject)
-        })
-    }
-
-    get embed(): MessageEmbed {
-        return new MessageEmbed({
-            title: 'Most voted movie',
-            description: "movies",
-            color: 'RED',
-            createdAt: new Date()
         })
     }
 
