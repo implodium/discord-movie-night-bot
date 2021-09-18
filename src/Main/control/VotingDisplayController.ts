@@ -5,9 +5,8 @@ import Logger from "../logger/Logger";
 import GuildConfiguration from "../config/GuildConfiguration";
 import {VoteDisplayType} from "../util/VoteDisplayType";
 import DiscordController from "./DiscordController";
-import {GuildChannel, Message, MessageEmbed, TextChannel} from "discord.js";
+import {GuildChannel, MessageEmbed, TextChannel} from "discord.js";
 import StorageController from "./StorageController";
-import Storage from "../data/Storage";
 
 @injectable()
 export default class VotingDisplayController {
@@ -114,7 +113,7 @@ export default class VotingDisplayController {
                                 .then(storage => {
                                     if (storage.winnerMessageId) {
                                         this.logger.info("updating message")
-                                        this.updateDisplayMessage(winningTextChannel)
+                                        this.updateDisplayMessage(winningTextChannel, storage.winnerMessageId, votingResult)
                                     } else {
                                         this.logger.info("sending message")
                                         this.sendDisplayMessage(winningTextChannel)
@@ -145,8 +144,15 @@ export default class VotingDisplayController {
         })
     }
 
-    private updateDisplayMessage(textChannel: TextChannel) {
-
+    private updateDisplayMessage(textChannel: TextChannel, messageId: string, votingResult: Map<string, number>) {
+        return new Promise<void>((resolve, reject) => {
+            this.discordController.getMessageOf(textChannel, messageId)
+                .then(message => {
+                    message.edit({embeds: [this.getEmbed(votingResult)]})
+                    resolve()
+                })
+                .catch(reject)
+        })
     }
 
     get embed(): MessageEmbed {
@@ -156,6 +162,55 @@ export default class VotingDisplayController {
             color: 'RED',
             createdAt: new Date()
         })
+    }
+
+    private getEmbed(votingResult: Map<string, number>): MessageEmbed {
+        const embed = VotingDisplayController.defaultEmbed
+
+        if (votingResult.size > 1) {
+            this.setEmbedForMultipleWinner(embed, votingResult)
+        } else {
+            this.setEmbedForOneWinner(embed, votingResult)
+        }
+
+        return embed
+    }
+
+    private setEmbedForMultipleWinner(embed: MessageEmbed, votingResult: Map<string, number>) {
+        embed.setDescription("Movies with the highest vote count: ")
+            .setTitle("Most voted movies")
+        votingResult.forEach((count, name) => {
+            embed.addField(name, `${count} votes`, true)
+        })
+
+        embed.addField('\u200B', '\u200B')
+    }
+
+    private setEmbedForOneWinner(embed: MessageEmbed, votingResult: Map<string, number>) {
+        embed.setDescription("The most voted Movie is: ")
+            .setTitle("Most voted movie")
+
+        let first = true
+        votingResult.forEach((count, name) => {
+            if (first) {
+                embed.addField(name, `${count} votes`)
+                first = false
+            }
+        })
+
+        embed.addField('\u200B', '\u200B')
+    }
+
+    private static get defaultEmbed() {
+        const c = new Date()
+        const dateString = `${c.getDate()}.${c.getMonth() + 1}.${c.getFullYear()} `
+        const timeString = `${c.getHours()}:${c.getMinutes()}:${c.getSeconds()}`
+        return new MessageEmbed()
+            .setColor("RED")
+            .addField('\u200B', '\u200B')
+            .setFooter(
+                `Last updated ${dateString} ${timeString}`
+            )
     }
 
     private static getBaseName(name: string) {
