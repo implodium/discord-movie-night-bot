@@ -38,7 +38,7 @@ export default class AnnouncementController {
                                         ) {
                                             const movieNightReminder = config.announcementMessages.movieNightReminder
                                             this.announcementBuilderController
-                                                .buildFinalMovieDecisionAnnouncement(movieNightReminder)
+                                                .buildMovieReminderAnnouncement(movieNightReminder)
                                                 .then(announcement => {
                                                     textChannel.send({embeds: [{}]})
                                                         .then(() => resolve())
