@@ -1,4 +1,5 @@
 import Announcement from "./Announcement";
+import {MessageEmbed} from "discord.js";
 
 export default class MovieNightReminderAnnouncements implements Announcement{
 
@@ -10,4 +11,7 @@ export default class MovieNightReminderAnnouncements implements Announcement{
         return ""
     }
 
+    get embed(): MessageEmbed {
+        return new MessageEmbed()
+    }
 }

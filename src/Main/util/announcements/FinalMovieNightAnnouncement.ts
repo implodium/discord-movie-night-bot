@@ -1,4 +1,5 @@
 import Announcement from "./Announcement";
+import {MessageEmbed} from "discord.js";
 
 export default class FinalMovieNightAnnouncement implements Announcement{
 
@@ -8,6 +9,10 @@ export default class FinalMovieNightAnnouncement implements Announcement{
 
     get title(): string {
         return ""
+    }
+
+    get embed(): MessageEmbed {
+        return new MessageEmbed()
     }
 
 }
