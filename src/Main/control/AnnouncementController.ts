@@ -5,6 +5,7 @@ import GuildConfigurations from "../config/GuildConfigurations";
 import DiscordController from "./DiscordController";
 import InternalError from "../error/InternalError";
 import {MessageEmbed, TextChannel} from "discord.js";
+import AnnouncementBuilderController from "./AnnouncementBuilderController";
 
 @injectable()
 export default class AnnouncementController {
@@ -12,7 +13,8 @@ export default class AnnouncementController {
     constructor(
         @inject(Logger) private logger: Logger,
         @inject(ConfigController) private configController: ConfigController,
-        @inject(DiscordController) private discordController: DiscordController
+        @inject(DiscordController) private discordController: DiscordController,
+        @inject(AnnouncementBuilderController) private announcementBuilderController: AnnouncementBuilderController
     ) {}
 
     init(): Promise<void> {
@@ -29,11 +31,20 @@ export default class AnnouncementController {
                                 this.configController
                                     .getAnnouncementConfigByGuildConfig(guildConfig)
                                     .then(config => {
-                                        this.logger.warn(config.automatic)
-
-                                        textChannel.send({embeds: [this.getEmbed()]})
-                                            .then(() => resolve())
-                                            .catch(reject)
+                                        if (config.announcementMessages
+                                            && config.announcementMessages.movieNightReminder
+                                            && config.announcementMessages.finalMovieDecision
+                                            && config.announcementMessages.finalMovieNight
+                                        ) {
+                                            const movieNightReminder = config.announcementMessages.movieNightReminder
+                                            this.announcementBuilderController
+                                                .buildFinalMovieDecisionAnnouncement(movieNightReminder)
+                                                .then(announcement => {
+                                                    textChannel.send({embeds: [{}]})
+                                                        .then(() => resolve())
+                                                        .catch(reject)
+                                                })
+                                        }
                                     })
                                     .catch(reject)
                             } else {
@@ -48,10 +59,5 @@ export default class AnnouncementController {
                 }
             }
         })
-    }
-
-    private getEmbed(): MessageEmbed {
-
-        return undefined;
     }
 }
