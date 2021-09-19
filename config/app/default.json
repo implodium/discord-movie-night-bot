@@ -20,9 +20,9 @@
     "day": "friday",
     "announcementMessages": {
       "movieNightReminder": {
-        "title": "Movie night: $date",
+        "titleDefault": "Movie night: $date",
         "descriptionThisWeek": "The next movie night is planned this $day",
-        "description": "the next movie night is in $dayAmount",
+        "descriptionDefault": "the next movie night is in $dayAmount",
         "movieUndetermined": "Unfortunately the movie ist not determined jet. You can still vote a movie. If the movie is still undetermined one night before the movie night it will be randomly decided.",
         "reactions": {
           "\uD83D\uDC4D": "I am in",
@@ -31,13 +31,13 @@
         }
       },
       "finalMovieDecision": {
-        "title": "Final Movie Decision for the movie night",
+        "titleDefault": "Final Movie Decision for the movie night",
         "descriptionDetermined": "The movie is now determined and is: $movie",
         "descriptionUndetermined": "The movie was still not determined and was randomly decided. It is $movie"
       },
       "finalMovieNight": {
-        "title": "Movie night start",
-        "description": "The movie night is starting. Get ready and join the $cinemaChannel channel"
+        "titleDefault": "Movie night start",
+        "descriptionDefault": "The movie night is starting. Get ready and join the $cinemaChannel channel"
       }
     }
   }

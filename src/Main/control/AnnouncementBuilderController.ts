@@ -16,7 +16,7 @@ export default class AnnouncementBuilderController {
 
     buildMovieReminderAnnouncement(announcement: MovieNightReminderAnnouncements): Promise<Announcement> {
         return new Promise((resolve, reject) => {
-            this.logger.warn('not implemented yet')
+            this.logger.debug(announcement)
         })
     }
 
