@@ -8,6 +8,8 @@ export default class MovieNightReminderAnnouncements implements Announcement{
     descriptionThisWeek?: string
     movieUndetermined?: string
     reactions?: Record<string, string>
+    day?: number
+    date?: Date
 
     get description(): string {
         return "";
@@ -19,5 +21,10 @@ export default class MovieNightReminderAnnouncements implements Announcement{
 
     get embed(): MessageEmbed {
         return new MessageEmbed()
+    }
+
+    setInfo(day: number, date: Date) {
+        this.day = day
+        this.date = date
     }
 }

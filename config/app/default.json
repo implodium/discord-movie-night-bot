@@ -21,7 +21,7 @@
     "announcementMessages": {
       "movieNightReminder": {
         "titleDefault": "Movie night: $date",
-        "descriptionThisWeek": "The next movie night is planned this $day",
+        "descriptionThisWeek": "The next movie night is planned this $weekDay",
         "descriptionDefault": "the next movie night is in $dayAmount",
         "movieUndetermined": "Unfortunately the movie ist not determined jet. You can still vote a movie. If the movie is still undetermined one night before the movie night it will be randomly decided.",
         "reactions": {
