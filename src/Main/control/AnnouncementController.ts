@@ -32,13 +32,13 @@ export default class AnnouncementController {
                                     .getAnnouncementConfigByGuildConfig(guildConfig)
                                     .then(config => {
                                         if (config.announcementMessages
-                                            && config.announcementMessages.movieNightReminder
-                                            && config.announcementMessages.finalMovieDecision
-                                            && config.announcementMessages.finalMovieNight
+                                            && config.announcementMessages.movieNight
+                                            && config.announcementMessages.movieNightFinalDecision
+                                            && config.announcementMessages.movieNightStart
                                         ) {
-                                            const movieNightReminder = config.announcementMessages.movieNightReminder
+                                            const movieNightReminder = config.announcementMessages.movieNight
                                             this.announcementBuilderController
-                                                .buildMovieReminderAnnouncement(movieNightReminder, config)
+                                                .buildMovieNight(movieNightReminder, config)
                                                 .then(announcement => {
                                                     textChannel.send({embeds: [{}]})
                                                         .then(() => resolve())

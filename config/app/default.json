@@ -19,7 +19,7 @@
     "every": "week",
     "day": "friday",
     "announcementMessages": {
-      "movieNightReminder": {
+      "movieNight": {
         "titleDefault": "Movie night: $date",
         "descriptionThisWeek": "The next movie night is planned this $weekDay",
         "descriptionDefault": "the next movie night is in $dayAmount",
@@ -30,12 +30,12 @@
           "\uD83C\uDDF8": "I can sponsor"
         }
       },
-      "finalMovieDecision": {
+      "movieNightFinalDecision": {
         "titleDefault": "Final Movie Decision for the movie night",
         "descriptionDetermined": "The movie is now determined and is: $movie",
         "descriptionUndetermined": "The movie was still not determined and was randomly decided. It is $movie"
       },
-      "finalMovieNight": {
+      "movieNightStart": {
         "titleDefault": "Movie night start",
         "descriptionDefault": "The movie night is starting. Get ready and join the $cinemaChannel channel"
       }

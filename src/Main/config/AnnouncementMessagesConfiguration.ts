@@ -1,9 +1,9 @@
-import MovieNightReminderAnnouncements from "../util/announcements/MovieNightReminderAnnouncements";
-import FinalMovieDecisionAnnouncement from "../util/announcements/FinalMovieDecisionAnnouncement";
-import FinalMovieNightAnnouncement from "../util/announcements/FinalMovieNightAnnouncement";
+import MovieNight from "../util/announcements/MovieNight";
+import MovieNightFinalDecision from "../util/announcements/MovieNightFinalDecision";
+import MovieNightStart from "../util/announcements/MovieNightStart";
 
 export default interface AnnouncementMessagesConfiguration {
-    movieNightReminder?: MovieNightReminderAnnouncements,
-    finalMovieDecision?: FinalMovieDecisionAnnouncement,
-    finalMovieNight?: FinalMovieNightAnnouncement
+    movieNight?: MovieNight,
+    movieNightFinalDecision?: MovieNightFinalDecision,
+    movieNightStart?: MovieNightStart
 }

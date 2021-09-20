@@ -1,7 +1,7 @@
 import Announcement from "./Announcement";
 import {MessageEmbed} from "discord.js";
 
-export default class FinalMovieDecisionAnnouncement implements Announcement {
+export default class MovieNightStart implements Announcement{
 
     get description(): string {
         return "";

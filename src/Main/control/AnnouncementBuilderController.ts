@@ -1,8 +1,8 @@
 import {inject, injectable} from "inversify";
-import MovieNightReminderAnnouncements from "../util/announcements/MovieNightReminderAnnouncements";
+import MovieNight from "../util/announcements/MovieNight";
 import Announcement from "../util/announcements/Announcement";
-import FinalMovieDecisionAnnouncement from "../util/announcements/FinalMovieDecisionAnnouncement";
-import FinalMovieNightAnnouncement from "../util/announcements/FinalMovieNightAnnouncement";
+import MovieNightFinalDecision from "../util/announcements/MovieNightFinalDecision";
+import MovieNightStart from "../util/announcements/MovieNightStart";
 import Logger from "../logger/Logger";
 import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
 
@@ -15,17 +15,17 @@ export default class AnnouncementBuilderController {
     }
 
 
-    buildMovieReminderAnnouncement(
-        announcement: MovieNightReminderAnnouncements,
+    buildMovieNight(
+        announcement: MovieNight,
         announcementConfig: AnnouncementConfiguration
     ): Promise<Announcement> {
         return new Promise((resolve, reject) => {
-            this.logger.debug(announcement.descriptionDefault)
+            this.logger.debug(announcement.titleDefault)
         })
     }
 
-    buildFinalMovieDecisionAnnouncement(
-        announcement: FinalMovieDecisionAnnouncement,
+    buildMovieNightFinalDecision(
+        announcement: MovieNightFinalDecision,
         announcementConfiguration: AnnouncementConfiguration
     ): Promise<Announcement> {
         return new Promise((resolve, reject) => {
@@ -33,8 +33,8 @@ export default class AnnouncementBuilderController {
         })
     }
 
-    buildFinalMovieNightAnnounvement(
-        announcement: FinalMovieNightAnnouncement,
+    buildMovieNightStart(
+        announcement: MovieNightStart,
         announcementConfiguration: AnnouncementConfiguration
     ): Promise<Announcement> {
         return new Promise((resolve, reject) => {
