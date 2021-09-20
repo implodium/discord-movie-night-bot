@@ -1,10 +1,10 @@
 import {inject, injectable} from "inversify";
 import MovieNight from "../util/announcements/MovieNight";
-import Announcement from "../util/announcements/Announcement";
 import MovieNightFinalDecision from "../util/announcements/MovieNightFinalDecision";
 import MovieNightStart from "../util/announcements/MovieNightStart";
 import Logger from "../logger/Logger";
 import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
+import {MessageEmbed} from "discord.js";
 
 @injectable()
 export default class AnnouncementBuilderController {
@@ -18,7 +18,7 @@ export default class AnnouncementBuilderController {
     buildMovieNight(
         announcement: MovieNight,
         announcementConfig: AnnouncementConfiguration
-    ): Promise<Announcement> {
+    ): Promise<MessageEmbed> {
         return new Promise((resolve, reject) => {
             this.logger.debug(announcement.titleDefault)
         })
@@ -27,7 +27,7 @@ export default class AnnouncementBuilderController {
     buildMovieNightFinalDecision(
         announcement: MovieNightFinalDecision,
         announcementConfiguration: AnnouncementConfiguration
-    ): Promise<Announcement> {
+    ): Promise<MessageEmbed> {
         return new Promise((resolve, reject) => {
             this.logger.warn('not implemented yet')
         })
@@ -36,7 +36,7 @@ export default class AnnouncementBuilderController {
     buildMovieNightStart(
         announcement: MovieNightStart,
         announcementConfiguration: AnnouncementConfiguration
-    ): Promise<Announcement> {
+    ): Promise<MessageEmbed> {
         return new Promise((resolve, reject) => {
             this.logger.warn('not implemented yet')
         })
