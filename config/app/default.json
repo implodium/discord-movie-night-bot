@@ -17,12 +17,12 @@
     "announcementTime": 3,
     "everyCount": 1,
     "every": "week",
-    "day": "friday",
+    "day": 1,
     "announcementMessages": {
       "movieNight": {
         "titleDefault": "Movie night: $date",
         "descriptionThisWeek": "The next movie night is planned this $weekDay",
-        "descriptionDefault": "the next movie night is in $dayAmount",
+        "descriptionDefault": "The next movie night is in $dayAmount days",
         "movieUndetermined": "Unfortunately the movie ist not determined jet. You can still vote a movie. If the movie is still undetermined one night before the movie night it will be randomly decided.",
         "reactions": {
           "\uD83D\uDC4D": "I am in",
