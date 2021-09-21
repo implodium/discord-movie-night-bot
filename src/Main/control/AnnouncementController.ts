@@ -6,6 +6,7 @@ import DiscordController from "./DiscordController";
 import InternalError from "../error/InternalError";
 import {MessageEmbed, TextChannel} from "discord.js";
 import AnnouncementBuilderController from "./AnnouncementBuilderController";
+import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
 
 @injectable()
 export default class AnnouncementController {
@@ -37,13 +38,18 @@ export default class AnnouncementController {
                                             && config.announcementMessages.movieNightStart
                                         ) {
                                             const movieNightReminder = config.announcementMessages.movieNight
-                                            this.announcementBuilderController
-                                                .buildMovieNight(movieNightReminder, config)
-                                                .then(announcement => {
-                                                    textChannel.send({embeds: [{}]})
-                                                        .then(() => resolve())
+                                            this.getDate(config)
+                                                .then(date => {
+                                                    this.announcementBuilderController
+                                                        .buildMovieNight(movieNightReminder, config, date)
+                                                        .then(embed => {
+                                                            textChannel.send({embeds: [embed]})
+                                                                .then(() => resolve())
+                                                                .catch(reject)
+                                                        })
                                                         .catch(reject)
                                                 })
+                                                .catch(reject)
                                         }
                                     })
                                     .catch(reject)
@@ -58,6 +64,26 @@ export default class AnnouncementController {
                         .catch(reject)
                 }
             }
+        })
+    }
+
+    private getDate(config: AnnouncementConfiguration): Promise<Date> {
+        return new Promise((resolve, reject) => {
+            const date = new Date()
+            switch (config.every) {
+                case 'week':
+                    if (config.everyCount && config.day) {
+                        date.setDate(date.getDate() + (config.day + (7 - date.getDay())) % 7)
+                        resolve(date)
+                    } else {
+                        reject(new InternalError('No every count configured'))
+                    }
+                    break
+                default:
+                    reject(new InternalError('Configuration property does not exist'))
+            }
+
+            resolve(new Date())
         })
     }
 }
