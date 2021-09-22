@@ -1,6 +1,4 @@
-import Announcement from "./Announcement";
-
-export default interface MovieNight extends Announcement {
+export default interface MovieNight {
 
     titleDefault?: string
     descriptionDefault?: string

@@ -6,10 +6,9 @@ import InternalError from "../error/InternalError";
 import {inject, injectable} from "inversify";
 import Logger from "../logger/Logger";
 import DateUtil from "../util/DateUtil";
-import Announcement from "../util/announcements/Announcement";
 
 @injectable()
-export default class MovieNightBuilder implements AnnouncementBuilder{
+export default class MovieNightBuilder implements AnnouncementBuilder<MovieNight> {
 
     constructor(
         @inject(Logger) private logger: Logger,
@@ -17,14 +16,13 @@ export default class MovieNightBuilder implements AnnouncementBuilder{
     ) { }
 
     async build(
-        announcement: Announcement,
+        announcement: MovieNight,
         announcementConfig: AnnouncementConfiguration,
         movieNightDate: Date
     ): Promise<MessageEmbed> {
         this.logger.info("building movie night announcement")
-        const movieNight = announcement as MovieNight
-        const title = await this.getTitle(movieNight, movieNightDate)
-        const description = await this.getDescription(movieNight, movieNightDate)
+        const title = await this.getTitle(announcement, movieNightDate)
+        const description = await this.getDescription(announcement, movieNightDate)
 
         return new MessageEmbed()
             .setTitle(title)
