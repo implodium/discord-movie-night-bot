@@ -6,6 +6,7 @@ import InternalError from "../error/InternalError";
 import {inject, injectable} from "inversify";
 import Logger from "../logger/Logger";
 import DateUtil from "../util/DateUtil";
+import Announcement from "../util/announcements/Announcement";
 
 @injectable()
 export default class MovieNightBuilder implements AnnouncementBuilder{
@@ -15,40 +16,52 @@ export default class MovieNightBuilder implements AnnouncementBuilder{
         @inject(DateUtil) private dateUtil: DateUtil
     ) { }
 
-    build(
-        announcement: MovieNight,
+    async build(
+        announcement: Announcement,
         announcementConfig: AnnouncementConfiguration,
         movieNightDate: Date
     ): Promise<MessageEmbed> {
-        return new Promise((resolve, reject) => {
-            this.logger.info("building movie night announcement")
-            let title = ""
-            let description = ""
+        this.logger.info("building movie night announcement")
+        const movieNight = announcement as MovieNight
+        const title = await this.getTitle(movieNight, movieNightDate)
+        const description = await this.getDescription(movieNight, movieNightDate)
 
+        return new MessageEmbed()
+            .setTitle(title)
+            .setColor('RED')
+            .setDescription(description)
+    }
+
+    private getTitle(announcement: MovieNight, date: Date): Promise<string> {
+        return new Promise((resolve, reject) => {
             if (announcement.titleDefault) {
-                title = announcement.titleDefault.replace(
-                    '$date', movieNightDate.toLocaleDateString(
+                const title = announcement.titleDefault.replace(
+                    '$date', date.toLocaleDateString(
                         'de-DE'
                     )
                 )
-                this.logger.debug(title);
+                resolve(title)
             } else {
                 reject(new InternalError('default title not set'))
-            }
-
-            if (announcement.descriptionDefault && announcement.descriptionThisWeek) {
-                if (!this.dateUtil.isThisWeek(movieNightDate)) {
-                    const dayAmount = this.dateUtil.getDaysUntil(movieNightDate)
-                    description = announcement.descriptionDefault.replace('$dayAmount', dayAmount.toString())
-                    this.logger.debug(description)
-                } else {
-                    const weekDay = this.dateUtil.getWeekDay(movieNightDate)
-                    description = announcement.descriptionThisWeek.replace("$weekDay", weekDay)
-                    this.logger.debug(description)
-                }
-                this.logger.debug(movieNightDate)
             }
         })
     }
 
+    private getDescription(announcement: MovieNight, date: Date): Promise<string> {
+        return new Promise((resolve, reject) => {
+            if (announcement.descriptionDefault && announcement.descriptionThisWeek) {
+                if (!this.dateUtil.isThisWeek(date)) {
+                    const dayAmount = this.dateUtil.getDaysUntil(date)
+                    resolve(announcement.descriptionDefault.replace('$dayAmount', dayAmount.toString()))
+                } else {
+                    const weekDay = this.dateUtil.getWeekDay(date)
+                    resolve(announcement.descriptionThisWeek.replace("$weekDay", weekDay))
+                }
+            } else {
+                reject(new InternalError("description " +
+                    "configurations not set for " +
+                    "announcement movieNight"))
+            }
+        })
+    }
 }

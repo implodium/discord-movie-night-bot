@@ -1,10 +1,10 @@
 import {MessageEmbed} from "discord.js";
-import MovieNight from "../util/announcements/MovieNight";
 import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
+import Announcement from "../util/announcements/Announcement";
 
 export default interface AnnouncementBuilder {
     build(
-        announcement: MovieNight,
+        announcement: Announcement,
         announcementConfig: AnnouncementConfiguration,
         movieNightDate: Date
     ): Promise<MessageEmbed>

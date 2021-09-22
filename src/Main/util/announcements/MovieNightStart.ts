@@ -1,2 +1,4 @@
-export default class MovieNightStart {
+import Announcement from "./Announcement";
+
+export default interface MovieNightStart extends Announcement{
 }
