@@ -7,6 +7,8 @@ import InternalError from "../error/InternalError";
 import {TextChannel} from "discord.js";
 import AnnouncementBuilderController from "./AnnouncementBuilderController";
 import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
+import GuildConfiguration from "../config/GuildConfiguration";
+import MovieNight from "../util/announcements/MovieNight";
 
 @injectable()
 export default class AnnouncementController {
@@ -18,59 +20,50 @@ export default class AnnouncementController {
         @inject(AnnouncementBuilderController) private announcementBuilderController: AnnouncementBuilderController
     ) {}
 
-    init(): Promise<void> {
-        return new Promise((resolve, reject) => {
-            const guildConfigs: GuildConfigurations = this.configController.getConfig('guilds')
+    async init(): Promise<void> {
+        const guildConfigs: GuildConfigurations = this.configController.getConfig('guilds')
 
-            for (const [id, guildConfig] of Object.entries(guildConfigs)) {
-                if (guildConfig.announcementChannelId) {
-                    this.discordController.getChannelOf(id, guildConfig.announcementChannelId)
-                        .then(channel => {
-                            if (channel.isText()) {
-                                const textChannel = channel as TextChannel
+        for (const [id, guildConfig] of Object.entries(guildConfigs)) {
+            const announcementChannel = await this.getAnnouncementChannel(id, guildConfig)
+            const announcementConfig = await this.configController.getAnnouncementConfigByGuildConfig(guildConfig)
+            const dateOfNextMovieNight = await this.getDate(announcementConfig)
 
-                                this.configController
-                                    .getAnnouncementConfigByGuildConfig(guildConfig)
-                                    .then(config => {
-                                        if (config.announcementMessages
-                                            && config.announcementMessages.movieNight
-                                            && config.announcementMessages.movieNightFinalDecision
-                                            && config.announcementMessages.movieNightStart
-                                        ) {
-                                            const movieNight = config.announcementMessages.movieNight
-                                            this.getDate(config)
-                                                .then(date => {
-                                                    this.announcementBuilderController
-                                                        .buildMovieNight(movieNight, config, date)
-                                                        .then(embed => {
-                                                            textChannel.send({embeds: [embed]})
-                                                                .then(message => {
-                                                                    return this.announcementBuilderController
-                                                                        .reactMovieNight(
-                                                                            message, movieNight
-                                                                        )
-                                                                })
-                                                                .then(resolve)
-                                                                .catch(reject)
-                                                        })
-                                                        .catch(reject)
-                                                })
-                                                .catch(reject)
-                                        }
-                                    })
-                                    .catch(reject)
-                            } else {
-                                reject(new InternalError("" +
-                                    "configuration invalid. " +
-                                    "Announcement channel needs" +
-                                    " to be a text channel"
-                                ))
-                            }
-                        })
-                        .catch(reject)
-                }
+            await this.initScheduler(announcementConfig, announcementChannel, dateOfNextMovieNight)
+        }
+    }
+
+    async initScheduler(config: AnnouncementConfiguration, outChannel: TextChannel, movieNightDate: Date) {
+        if (
+            config.announcementMessages
+            && config.announcementMessages.movieNight
+            && config.announcementMessages.movieNightFinalDecision
+            && config.announcementMessages.movieNightStart
+        ) {
+            await this.scheduleMovieNight(
+                config,
+                config.announcementMessages.movieNight,
+                outChannel,
+                movieNightDate
+            )
+        }
+
+    }
+
+    async getAnnouncementChannel(guildId: string, guildConfig: GuildConfiguration) {
+        if (guildConfig.announcementChannelId) {
+            const channel = await this.discordController
+                .getChannelOf(guildId, guildConfig.announcementChannelId)
+
+            if (channel.isText()) {
+                return channel as TextChannel
+            } else {
+                throw new InternalError(
+                    `given announcement channel is not a text channel. Is: ${channel.type}`
+                )
             }
-        })
+        } else {
+            throw new InternalError('announcement channel not defined for given guild')
+        }
     }
 
     private getDate(config: AnnouncementConfiguration): Promise<Date> {
@@ -99,5 +92,20 @@ export default class AnnouncementController {
 
             resolve(new Date())
         })
+    }
+
+    private async scheduleMovieNight(
+        config: AnnouncementConfiguration,
+        movieNight: MovieNight,
+        outChannel: TextChannel,
+        movieNightDate: Date
+    ) {
+        const embed = await this.announcementBuilderController.buildMovieNight(
+            movieNight,
+            config,
+            movieNightDate
+        )
+
+        await outChannel.send({embeds: [embed]})
     }
 }
