@@ -4,7 +4,7 @@ import ConfigController from "./ConfigController";
 import GuildConfigurations from "../config/GuildConfigurations";
 import DiscordController from "./DiscordController";
 import InternalError from "../error/InternalError";
-import {MessageEmbed, TextChannel} from "discord.js";
+import {TextChannel} from "discord.js";
 import AnnouncementBuilderController from "./AnnouncementBuilderController";
 import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
 
@@ -37,14 +37,20 @@ export default class AnnouncementController {
                                             && config.announcementMessages.movieNightFinalDecision
                                             && config.announcementMessages.movieNightStart
                                         ) {
-                                            const movieNightReminder = config.announcementMessages.movieNight
+                                            const movieNight = config.announcementMessages.movieNight
                                             this.getDate(config)
                                                 .then(date => {
                                                     this.announcementBuilderController
-                                                        .buildMovieNight(movieNightReminder, config, date)
+                                                        .buildMovieNight(movieNight, config, date)
                                                         .then(embed => {
                                                             textChannel.send({embeds: [embed]})
-                                                                .then(() => resolve())
+                                                                .then(message => {
+                                                                    return this.announcementBuilderController
+                                                                        .reactMovieNight(
+                                                                            message, movieNight
+                                                                        )
+                                                                })
+                                                                .then(resolve)
                                                                 .catch(reject)
                                                         })
                                                         .catch(reject)

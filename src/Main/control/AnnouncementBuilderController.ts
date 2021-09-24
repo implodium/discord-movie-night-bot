@@ -4,8 +4,7 @@ import MovieNightFinalDecision from "../util/announcements/MovieNightFinalDecisi
 import MovieNightStart from "../util/announcements/MovieNightStart";
 import Logger from "../logger/Logger";
 import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
-import {MessageEmbed} from "discord.js";
-import InternalError from "../error/InternalError";
+import {Message, MessageEmbed} from "discord.js";
 import DateUtil from "../util/DateUtil";
 import MovieNightBuilder from "../announcemen_builder/MovieNightBuilder";
 
@@ -30,6 +29,13 @@ export default class AnnouncementBuilderController {
             announcementConfig,
             movieNightDate
         )
+    }
+
+    reactMovieNight(
+        message: Message,
+        announcement: MovieNight
+    ): Promise<void> {
+        return this.movieNightBuilder.react(message, announcement)
     }
 
     buildMovieNightFinalDecision(
