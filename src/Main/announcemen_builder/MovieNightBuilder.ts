@@ -44,8 +44,15 @@ export default class MovieNightBuilder implements AnnouncementBuilder<MovieNight
         return new Promise((resolve, reject) => {
             if (announcement.titleDefault) {
                 const title = announcement.titleDefault.replace(
-                    '$date', date.toLocaleDateString(
-                        'de-DE'
+                    '$date', date.toLocaleString(
+                        'de-DE',
+                        {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        }
                     )
                 )
                 resolve(title)

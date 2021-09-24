@@ -78,9 +78,17 @@ export default class AnnouncementController {
             const date = new Date()
             switch (config.every) {
                 case 'week':
-                    if (config.everyCount && config.day) {
+                    if (config.everyCount && config.day && config.time) {
+                        const timeStringComponents = config.time.split(':')
                         date.setDate(date.getDate() + (config.day + (7 - date.getDay())) % 7)
-                        resolve(date)
+
+                        try {
+                            date.setHours(parseInt(timeStringComponents[0], 0))
+                            date.setMinutes(parseInt(timeStringComponents[1], 0))
+                            resolve(date)
+                        } catch (e) {
+                            reject(new InternalError("Configuration requires format: hh:mm => 18:00"))
+                        }
                     } else {
                         reject(new InternalError('No every count configured'))
                     }

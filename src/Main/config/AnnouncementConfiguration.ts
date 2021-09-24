@@ -6,5 +6,6 @@ export default interface AnnouncementConfiguration {
     everyCount?: number
     every?: string
     day?: number
+    time?: string
     announcementMessages?: AnnouncementMessagesConfiguration
 }
