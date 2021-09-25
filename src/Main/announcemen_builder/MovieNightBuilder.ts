@@ -7,11 +7,11 @@ import {inject, injectable} from "inversify";
 import Logger from "../logger/Logger";
 import DateUtil from "../util/DateUtil";
 import VotingController from "../control/VotingController";
+import {take
+} from "rxjs/operators";
 
 @injectable()
 export default class MovieNightBuilder implements AnnouncementBuilder<MovieNight> {
-
-    private _mostVoted?: Promise<Map<string, number>>
 
     constructor(
         @inject(Logger) private logger: Logger,
@@ -144,15 +144,24 @@ export default class MovieNightBuilder implements AnnouncementBuilder<MovieNight
     }
 
     private getMostVoted(): Promise<Map<string, number>> {
-        if (this._mostVoted) {
-            const mostVoted = this._mostVoted
-            return new Promise(resolve => {
-                resolve(mostVoted)
-            })
-        } else {
-            const mostVotedObservable = this.votingController.mostVoted
-            this._mostVoted = mostVotedObservable.toPromise()
-            return mostVotedObservable.toPromise()
-        }
+        return new Promise(resolve => {
+            this.votingController.mostVoted
+                .pipe(take(1))
+                .subscribe(value => {
+                    this.logger.debug("getting new most voted")
+                    resolve(value)
+                })
+        })
+
+        // if (this._mostVoted) {
+        //     const mostVoted = this._mostVoted
+        //     return new Promise(resolve => {
+        //         resolve(mostVoted)
+        //     })
+        // } else {
+        //     const mostVotedObservable = this.votingController.mostVoted
+        //     this._mostVoted = mostVotedObservable.toPromise()
+        //     return mostVotedObservable.toPromise()
+        // }
     }
 }

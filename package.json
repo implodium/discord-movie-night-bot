@@ -16,10 +16,12 @@
   "license": "ISC",
   "devDependencies": {
     "@types/config": "^0.0.39",
+    "@types/node-cron": "^2.0.4",
     "@webpack-cli/generators": "^2.3.0",
     "config": "^3.3.6",
     "dotenv": "^10.0.0",
     "inversify": "^5.1.1",
+    "node-cron": "^3.0.0",
     "nodemon": "^2.0.12",
     "reflect-metadata": "^0.1.13",
     "ts-loader": "^9.2.5",

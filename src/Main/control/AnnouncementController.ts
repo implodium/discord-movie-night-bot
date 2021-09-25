@@ -9,6 +9,7 @@ import AnnouncementBuilderController from "./AnnouncementBuilderController";
 import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
 import GuildConfiguration from "../config/GuildConfiguration";
 import MovieNight from "../util/announcements/MovieNight";
+import * as cron from 'node-cron'
 
 @injectable()
 export default class AnnouncementController {
@@ -26,13 +27,12 @@ export default class AnnouncementController {
         for (const [id, guildConfig] of Object.entries(guildConfigs)) {
             const announcementChannel = await this.getAnnouncementChannel(id, guildConfig)
             const announcementConfig = await this.configController.getAnnouncementConfigByGuildConfig(guildConfig)
-            const dateOfNextMovieNight = await this.getDate(announcementConfig)
 
-            await this.initScheduler(announcementConfig, announcementChannel, dateOfNextMovieNight)
+            await this.initScheduler(announcementConfig, announcementChannel)
         }
     }
 
-    async initScheduler(config: AnnouncementConfiguration, outChannel: TextChannel, movieNightDate: Date) {
+    async initScheduler(config: AnnouncementConfiguration, outChannel: TextChannel) {
         if (
             config.announcementMessages
             && config.announcementMessages.movieNight
@@ -43,7 +43,6 @@ export default class AnnouncementController {
                 config,
                 config.announcementMessages.movieNight,
                 outChannel,
-                movieNightDate
             )
         }
 
@@ -98,14 +97,46 @@ export default class AnnouncementController {
         config: AnnouncementConfiguration,
         movieNight: MovieNight,
         outChannel: TextChannel,
-        movieNightDate: Date
     ) {
-        const embed = await this.announcementBuilderController.buildMovieNight(
-            movieNight,
-            config,
-            movieNightDate
-        )
+        if (config.announcementTime) {
+            const scheduleString = await AnnouncementController.getScheduleString(config, -config.announcementTime)
+            this.logger.debug(scheduleString)
+            cron.schedule(scheduleString, async () => {
+                this.logger.debug("now announcing on schedule")
+                const dateOfMovieNight = await this.getDate(config)
+                this.logger.debug(dateOfMovieNight)
+                const embed = await this.announcementBuilderController.buildMovieNight(
+                    movieNight,
+                    config,
+                    dateOfMovieNight
+                )
 
-        await outChannel.send({embeds: [embed]})
+                await outChannel.send({embeds: [embed]})
+            })
+        }
+    }
+
+    // offset number of days before (-) or after (+) the movie night
+    private static async getScheduleString(config: AnnouncementConfiguration, offSet: number): Promise<string> {
+        if (config.every && config.day && config.time) {
+            switch (config.every) {
+                case 'week':
+                    let weekDay = config.day + offSet
+                    const [hour, minute] = config.time.split(':')
+
+                    if (weekDay <= 0) {
+                        weekDay = 7 + weekDay
+                    } else if (weekDay > 7) {
+                        weekDay = weekDay - 7
+                    }
+
+                    return `0 ${minute} ${hour} * * ${weekDay}`
+                default:
+                    throw new InternalError('Configuration property does not exist')
+            }
+        } else {
+            throw new InternalError("there is configurations missing " +
+                "for determining the scheduling string")
+        }
     }
 }

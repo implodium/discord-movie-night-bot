@@ -7,13 +7,14 @@ import UserError from "../error/UserError";
 import GuildConfigurations from "../config/GuildConfigurations";
 import InternalError from "../error/InternalError";
 import VotingDisplayController from "./VotingDisplayController";
-import {Observable, Subject} from "rxjs";
+import {BehaviorSubject, Observable} from "rxjs";
+import {map} from "rxjs/operators";
 
 @injectable()
 export default class VotingController {
 
     private discordClient: Client
-    private _mostVoted = new Subject<Map<string, number>>()
+    private _mostVoted = new BehaviorSubject<Map<string, number> | undefined>(undefined)
 
     constructor(
         @inject(DiscordController) private discordController: DiscordController,
@@ -130,7 +131,6 @@ export default class VotingController {
                 reject('something went wrong most voted could not be evaluated')
             } else {
                 this._mostVoted.next(mostVoted)
-                this._mostVoted.complete()
                 resolve(mostVoted)
             }
 
@@ -140,6 +140,7 @@ export default class VotingController {
     initVotingSystem(): Promise<void> {
         this.logger.info("initializing voting System")
         const guildConfigs: GuildConfigurations = this.configController.getGuildConfigurations()
+
 
         return new Promise((resolve, reject) => {
             for (const [id, guildConfig] of Object.entries(guildConfigs)) {
@@ -186,5 +187,12 @@ export default class VotingController {
 
     get mostVoted(): Observable<Map<string, number>> {
         return this._mostVoted
+            .pipe(map(value => {
+                if (value) {
+                    return value
+                } else  {
+                    throw new InternalError("value undefined")
+                }
+            }))
     }
 }
