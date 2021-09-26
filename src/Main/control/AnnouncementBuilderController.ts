@@ -7,6 +7,7 @@ import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
 import {Message, MessageEmbed} from "discord.js";
 import DateUtil from "../util/DateUtil";
 import MovieNightBuilder from "../announcemen_builder/MovieNightBuilder";
+import MovieNightFinalDecisionBuilder from "../announcemen_builder/MovieNightFinalDecisionBuilder";
 
 @injectable()
 export default class AnnouncementBuilderController {
@@ -14,7 +15,8 @@ export default class AnnouncementBuilderController {
     constructor(
         @inject(Logger) private logger: Logger,
         @inject(DateUtil) private dateUtil: DateUtil,
-        @inject(MovieNightBuilder) private movieNightBuilder: MovieNightBuilder
+        @inject(MovieNightBuilder) private movieNightBuilder: MovieNightBuilder,
+        @inject(MovieNightFinalDecisionBuilder) private movieNightFinalDecisionBuilder: MovieNightFinalDecisionBuilder
     ) {
     }
 
@@ -42,9 +44,11 @@ export default class AnnouncementBuilderController {
         announcement: MovieNightFinalDecision,
         announcementConfiguration: AnnouncementConfiguration
     ): Promise<MessageEmbed> {
-        return new Promise((resolve, reject) => {
-            this.logger.warn('not implemented yet')
-        })
+        return this.movieNightFinalDecisionBuilder.build(
+            announcement,
+            announcementConfiguration,
+            new Date()
+        )
     }
 
     buildMovieNightStart(

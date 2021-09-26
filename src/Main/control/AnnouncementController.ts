@@ -10,6 +10,7 @@ import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
 import GuildConfiguration from "../config/GuildConfiguration";
 import MovieNight from "../util/announcements/MovieNight";
 import * as cron from 'node-cron'
+import MovieNightFinalDecision from "../util/announcements/MovieNightFinalDecision";
 
 @injectable()
 export default class AnnouncementController {
@@ -43,6 +44,12 @@ export default class AnnouncementController {
                 config,
                 config.announcementMessages.movieNight,
                 outChannel,
+            )
+
+            await this.scheduleMovieNightFinalDecision(
+                config,
+                config.announcementMessages.movieNightFinalDecision,
+                outChannel
             )
         }
 
@@ -137,6 +144,41 @@ export default class AnnouncementController {
         } else {
             throw new InternalError("there is configurations missing " +
                 "for determining the scheduling string")
+        }
+    }
+
+    private async scheduleMovieNightFinalDecision(
+        config: AnnouncementConfiguration,
+        announcement: MovieNightFinalDecision,
+        outChannel: TextChannel
+    ) {
+        const scheduleString = await AnnouncementController.getScheduleString(config, -1)
+        cron.schedule(scheduleString, async () => {
+            await this.sendMovieNightFinalDecision(
+                config,
+                announcement,
+                outChannel
+            )
+        })
+    }
+
+    private async sendMovieNightFinalDecision(
+        config: AnnouncementConfiguration,
+        announcement: MovieNightFinalDecision,
+        outChannel: TextChannel
+    ) {
+        this.logger.debug('sending the final decision')
+
+        try {
+            const embed = await this.announcementBuilderController.buildMovieNightFinalDecision(
+                announcement,
+                config
+            )
+
+            this.logger.debug(embed)
+            await outChannel.send({embeds: [embed]})
+        } catch (e) {
+            this.logger.error(e)
         }
     }
 }

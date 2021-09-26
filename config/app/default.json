@@ -16,9 +16,9 @@
     "automatic": true,
     "announcementTime": 3,
     "everyCount": 1,
-    "time": "01:44",
+    "time": "02:53",
     "every": "week",
-    "day": 3,
+    "day": 1,
     "announcementMessages": {
       "movieNight": {
         "titleDefault": "Movie night: $date",
@@ -34,7 +34,7 @@
       "movieNightFinalDecision": {
         "titleDefault": "Final Movie Decision for the movie night",
         "descriptionDetermined": "The movie is now determined and is: $movie",
-        "descriptionUndetermined": "The movie was still not determined and was randomly decided. It is $movie"
+        "descriptionUndetermined": "The movie was still not determined and was randomly decided. It is ..."
       },
       "movieNightStart": {
         "titleDefault": "Movie night start",

@@ -8,7 +8,7 @@ import GuildConfigurations from "../config/GuildConfigurations";
 import InternalError from "../error/InternalError";
 import VotingDisplayController from "./VotingDisplayController";
 import {BehaviorSubject, Observable} from "rxjs";
-import {map} from "rxjs/operators";
+import {filter} from "rxjs/operators";
 
 @injectable()
 export default class VotingController {
@@ -187,12 +187,8 @@ export default class VotingController {
 
     get mostVoted(): Observable<Map<string, number>> {
         return this._mostVoted
-            .pipe(map(value => {
-                if (value) {
-                    return value
-                } else  {
-                    throw new InternalError("value undefined")
-                }
-            }))
+            .pipe(
+                filter(value => value !== undefined)
+            ) as Observable<Map<string, number>>
     }
 }
