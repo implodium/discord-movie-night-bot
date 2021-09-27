@@ -42,7 +42,6 @@ export default class MovieNightFinalDecisionBuilder implements AnnouncementBuild
             this.votingController.mostVoted
                 .pipe(take(1))
                 .subscribe(value => {
-                    this.logger.debug(value)
                     resolve(value)
                 })
         })

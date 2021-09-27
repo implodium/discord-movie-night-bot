@@ -115,11 +115,8 @@ export default class AnnouncementController {
     ) {
         if (config.announcementTime) {
             const scheduleString = await AnnouncementController.getScheduleString(config, -config.announcementTime)
-            this.logger.debug(scheduleString)
             cron.schedule(scheduleString, async () => {
-                this.logger.debug("now announcing on schedule")
                 const dateOfMovieNight = await this.getDate(config)
-                this.logger.debug(dateOfMovieNight)
                 const embed = await this.announcementBuilderController.buildMovieNight(
                     movieNight,
                     config,
@@ -207,18 +204,11 @@ export default class AnnouncementController {
         announcement: MovieNightFinalDecision,
         outChannel: TextChannel
     ) {
-        this.logger.debug('sending the final decision')
+        const embed = await this.announcementBuilderController.buildMovieNightFinalDecision(
+            announcement,
+            config
+        )
 
-        try {
-            const embed = await this.announcementBuilderController.buildMovieNightFinalDecision(
-                announcement,
-                config
-            )
-
-            this.logger.debug(embed)
-            await outChannel.send({embeds: [embed]})
-        } catch (e) {
-            this.logger.error(e)
-        }
+        await outChannel.send({embeds: [embed]})
     }
 }

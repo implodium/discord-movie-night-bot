@@ -93,7 +93,6 @@ export default class MovieNightBuilder implements AnnouncementBuilder<MovieNight
 
     private async isMovieDetermined(): Promise<boolean> {
         const mostVoted = await this.getMostVoted()
-        this.logger.debug(mostVoted)
         return mostVoted.size < 2
     }
 
@@ -129,7 +128,6 @@ export default class MovieNightBuilder implements AnnouncementBuilder<MovieNight
         const mostVoted = await this.getMostVoted()
 
         if (mostVoted) {
-            this.logger.debug(mostVoted)
             messageEmbed.addField('\u200B', '\u200B')
 
             mostVoted.forEach((count: number, movie: string) => {
@@ -148,7 +146,6 @@ export default class MovieNightBuilder implements AnnouncementBuilder<MovieNight
             this.votingController.mostVoted
                 .pipe(take(1))
                 .subscribe(value => {
-                    this.logger.debug("getting new most voted")
                     resolve(value)
                 })
         })
