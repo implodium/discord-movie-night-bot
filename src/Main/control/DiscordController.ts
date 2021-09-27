@@ -10,14 +10,18 @@ import {
     Snowflake,
     TextChannel
 } from "discord.js";
+import {SlashCommandBuilder} from '@discordjs/builders'
 import GuildConfiguration from "../config/GuildConfiguration";
 import InternalError from "../error/InternalError";
 import Logger from "../logger/Logger";
+import {REST} from "@discordjs/rest";
+import {Routes} from "discord-api-types/v9";
 
 @injectable()
 export default class DiscordController {
 
     private readonly _client: Client
+    private readonly _rest: REST
 
     constructor(
         @inject(ConfigController) private configController: ConfigController,
@@ -31,6 +35,8 @@ export default class DiscordController {
             ]
         })
 
+        this._rest = new REST({version: '9'})
+
         this.init()
     }
 
@@ -40,6 +46,8 @@ export default class DiscordController {
         if (token) {
             this._client.login(token)
                 .catch(this.logger.error)
+
+            this._rest.setToken(token)
         } else {
             throw new Error("No Token present")
         }
@@ -129,5 +137,17 @@ export default class DiscordController {
                 })
                 .catch(reject)
         })
+    }
+
+    refreshCommands(guildId: string, commands: SlashCommandBuilder[]) {
+        const jsonCommands = commands
+            .map(command => command.toJSON())
+
+        if (this._client.user && this._client.user.id) {
+            this._rest.put(
+                Routes.applicationGuildCommands(this._client.user.id, guildId),
+                {body: jsonCommands}
+            )
+        }
     }
 }
