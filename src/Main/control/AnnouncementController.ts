@@ -176,13 +176,6 @@ export default class AnnouncementController {
         outChannel: TextChannel,
         guildConfig: GuildConfiguration
     ) {
-        await this.sendMovieNightStart(
-            announcement,
-            config,
-            guildConfig,
-            outChannel
-        )
-
         const scheduleString = await AnnouncementController.getScheduleString(config)
         cron.schedule(scheduleString, async () => {
             await this.sendMovieNightStart(
