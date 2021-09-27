@@ -11,6 +11,7 @@ import GuildConfiguration from "../config/GuildConfiguration";
 import MovieNight from "../util/announcements/MovieNight";
 import * as cron from 'node-cron'
 import MovieNightFinalDecision from "../util/announcements/MovieNightFinalDecision";
+import MovieNightStart from "../util/announcements/MovieNightStart";
 
 @injectable()
 export default class AnnouncementController {
@@ -49,6 +50,12 @@ export default class AnnouncementController {
             await this.scheduleMovieNightFinalDecision(
                 config,
                 config.announcementMessages.movieNightFinalDecision,
+                outChannel
+            )
+
+            await this.scheduleMovieNightStart(
+                config,
+                config.announcementMessages.movieNightStart,
                 outChannel
             )
         }
@@ -124,7 +131,7 @@ export default class AnnouncementController {
     }
 
     // offset number of days before (-) or after (+) the movie night
-    private static async getScheduleString(config: AnnouncementConfiguration, offSet: number): Promise<string> {
+    private static async getScheduleString(config: AnnouncementConfiguration, offSet: number = 0): Promise<string> {
         if (config.every && config.day && config.time) {
             switch (config.every) {
                 case 'week':
@@ -159,6 +166,22 @@ export default class AnnouncementController {
                 announcement,
                 outChannel
             )
+        })
+    }
+
+    private async scheduleMovieNightStart(
+        config: AnnouncementConfiguration,
+        announcement: MovieNightStart,
+        outChannel: TextChannel
+    ) {
+        const scheduleString = await AnnouncementController.getScheduleString(config)
+        cron.schedule(scheduleString, async () => {
+            const embed = await this.announcementBuilderController.buildMovieNightStart(
+                config,
+                announcement,
+            )
+
+            outChannel.send({embeds: [embed]})
         })
     }
 
