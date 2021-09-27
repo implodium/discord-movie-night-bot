@@ -133,7 +133,7 @@ export default class AnnouncementController {
 
     // offset number of days before (-) or after (+) the movie night
     private static async getScheduleString(config: AnnouncementConfiguration, offSet: number = 0): Promise<string> {
-        if (config.every && config.day && config.time) {
+        if (config.every && config.day && config.time && config.everyCount) {
             switch (config.every) {
                 case 'week':
                     let weekDay = config.day + offSet
@@ -145,7 +145,7 @@ export default class AnnouncementController {
                         weekDay = weekDay - 7
                     }
 
-                    return `0 ${minute} ${hour} * * ${weekDay}`
+                    return `0 ${minute} ${hour} * * ${weekDay}/${config.everyCount}`
                 default:
                     throw new InternalError('Configuration property does not exist')
             }
