@@ -185,3 +185,9 @@ dist
 # .nfs files are created when an open file is removed but is still being accessed
 .nfs*
 
+### ENV Files
+
+config/env/.env.prod
+config/env/.env.dev
+.gitsecret/keys/random_seed
+!*.secret
