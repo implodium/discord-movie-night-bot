@@ -1,4 +1,5 @@
 import {VoteDisplayType} from "../util/VoteDisplayType";
+import AnnouncementConfiguration from "./AnnouncementConfiguration";
 
 export default interface GuildConfiguration {
     votingDisplayTypes?: [VoteDisplayType];
@@ -6,5 +7,8 @@ export default interface GuildConfiguration {
     votingChannelId?: string,
     errChannel?: string
     winningChannelId?: string
-    winningMessageId?: string
+    winningMessageId?: string,
+    announcementChannelId?: string
+    announcements?: AnnouncementConfiguration
+    cinemaChannelId?: string
 }
