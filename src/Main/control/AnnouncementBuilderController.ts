@@ -8,6 +8,8 @@ import {Message, MessageEmbed} from "discord.js";
 import DateUtil from "../util/DateUtil";
 import MovieNightBuilder from "../announcemen_builder/MovieNightBuilder";
 import MovieNightFinalDecisionBuilder from "../announcemen_builder/MovieNightFinalDecisionBuilder";
+import MovieNightStartBuilder from "../announcemen_builder/MovieNightStartBuilder";
+import GuildConfiguration from "../config/GuildConfiguration";
 
 @injectable()
 export default class AnnouncementBuilderController {
@@ -16,7 +18,8 @@ export default class AnnouncementBuilderController {
         @inject(Logger) private logger: Logger,
         @inject(DateUtil) private dateUtil: DateUtil,
         @inject(MovieNightBuilder) private movieNightBuilder: MovieNightBuilder,
-        @inject(MovieNightFinalDecisionBuilder) private movieNightFinalDecisionBuilder: MovieNightFinalDecisionBuilder
+        @inject(MovieNightFinalDecisionBuilder) private movieNightFinalDecisionBuilder: MovieNightFinalDecisionBuilder,
+        @inject(MovieNightStartBuilder) private movieNightStartBuilder: MovieNightStartBuilder
     ) {
     }
 
@@ -53,11 +56,14 @@ export default class AnnouncementBuilderController {
 
     buildMovieNightStart(
         announcement: MovieNightStart,
-        announcementConfiguration: AnnouncementConfiguration
+        announcementConfiguration: AnnouncementConfiguration,
+        guildConfig: GuildConfiguration
     ): Promise<MessageEmbed> {
-        return new Promise((resolve, reject) => {
-            this.logger.warn('not implemented yet')
-        })
+        return this.movieNightStartBuilder.buildWithInfo(
+            announcement,
+            announcementConfiguration,
+            guildConfig
+        )
     }
 
 }

@@ -30,11 +30,11 @@ export default class AnnouncementController {
             const announcementChannel = await this.getAnnouncementChannel(id, guildConfig)
             const announcementConfig = await this.configController.getAnnouncementConfigByGuildConfig(guildConfig)
 
-            await this.initScheduler(announcementConfig, announcementChannel)
+            await this.initScheduler(announcementConfig, announcementChannel, guildConfig)
         }
     }
 
-    async initScheduler(config: AnnouncementConfiguration, outChannel: TextChannel) {
+    async initScheduler(config: AnnouncementConfiguration, outChannel: TextChannel, guildConfig: GuildConfiguration) {
         if (
             config.announcementMessages
             && config.announcementMessages.movieNight
@@ -56,7 +56,8 @@ export default class AnnouncementController {
             await this.scheduleMovieNightStart(
                 config,
                 config.announcementMessages.movieNightStart,
-                outChannel
+                outChannel,
+                guildConfig
             )
         }
 
@@ -172,17 +173,40 @@ export default class AnnouncementController {
     private async scheduleMovieNightStart(
         config: AnnouncementConfiguration,
         announcement: MovieNightStart,
-        outChannel: TextChannel
+        outChannel: TextChannel,
+        guildConfig: GuildConfiguration
     ) {
+        await this.sendMovieNightStart(
+            announcement,
+            config,
+            guildConfig,
+            outChannel
+        )
+
         const scheduleString = await AnnouncementController.getScheduleString(config)
         cron.schedule(scheduleString, async () => {
-            const embed = await this.announcementBuilderController.buildMovieNightStart(
-                config,
+            await this.sendMovieNightStart(
                 announcement,
+                config,
+                guildConfig,
+                outChannel
             )
-
-            outChannel.send({embeds: [embed]})
         })
+    }
+
+    private async sendMovieNightStart(
+        announcement: MovieNightStart,
+        config: AnnouncementConfiguration,
+        guildConfig: GuildConfiguration,
+        outChannel: TextChannel
+    ) {
+        const embed = await this.announcementBuilderController.buildMovieNightStart(
+            announcement,
+            config,
+            guildConfig
+        )
+
+        await outChannel.send({embeds: [embed]})
     }
 
     private async sendMovieNightFinalDecision(

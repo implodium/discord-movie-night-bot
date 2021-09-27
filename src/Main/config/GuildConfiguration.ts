@@ -10,4 +10,5 @@ export default interface GuildConfiguration {
     winningMessageId?: string,
     announcementChannelId?: string
     announcements?: AnnouncementConfiguration
+    cinemaChannelId?: string
 }
