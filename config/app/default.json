@@ -9,6 +9,7 @@
       "winningMessageId": "888660493777137664",
       "cinemaChannelId": "888834356095901757",
       "announcementChannelId": "888384291690643528",
+      "adminRoleId": "617895674645577750",
       "votingDisplayTypes": ["CHANNEL_MESSAGE"]
     }
   },
