@@ -49,7 +49,6 @@ export default class CommandController {
         this.discordController.client.on('interactionCreate', async interaction => {
             if (interaction.isCommand()
                 && interaction.commandName === command.name
-                && await this.isPermittedFor(command, guildConfig, interaction)
             ) {
                 if (await this.isPermittedFor(command, guildConfig, interaction)) {
                     await command.exec(interaction)
@@ -64,36 +63,53 @@ export default class CommandController {
 
     private async isPermittedFor(command: Command, guildConfig: GuildConfiguration, interaction: CommandInteraction): Promise<boolean> {
         if (interaction.guild) {
-            const member = await interaction.guild.members.fetch(interaction.user.id)
-            const highestMemberRole = member.roles.highest
             switch (command.mode) {
                 case PermissionMode.ADMIN_ONLY:
-                    const adminRoleId = guildConfig.adminRoleId
-                    if (adminRoleId) {
-                        const adminRole = await interaction.guild.roles.fetch(adminRoleId)
-                        if (adminRole) {
-                            this.logger.debug(adminRole.comparePositionTo(highestMemberRole))
-                            return highestMemberRole.comparePositionTo(adminRole) >= 0
-                        } else {
-                            throw new InternalError("given admin role id appears to be invalid")
-                        }
-                    } else {
-                        throw new InternalError('admin role was not configured')
-                    }
+                    return this.checkAdminOnlyPermission(guildConfig, interaction)
                 case PermissionMode.WHITELIST:
-                    const user = interaction.user
-
-                    const commandRoles = command.listedRoles
-                    const guildMember = await interaction.guild
-                        .members
-                        .fetch(user.id)
-                    const userRoles = guildMember.roles.valueOf()
-                    const intersection = userRoles.filter(role => commandRoles.includes(role.id))
-
-                    return intersection.size > 0
+                    return this.checkWhiteListPermission(interaction, command)
                 default:
                     throw new InternalError('permission mode does not exist')
             }
+        } else {
+            throw new InternalError('Command should only be executed in a guild')
+        }
+    }
+
+    private async checkAdminOnlyPermission(guildConfig: GuildConfiguration, interaction: CommandInteraction): Promise<boolean> {
+        if (interaction.guild) {
+            const member = await interaction.guild.members.fetch(interaction.user.id)
+            const highestMemberRole = member.roles.highest
+            const adminRoleId = guildConfig.adminRoleId
+
+            if (adminRoleId) {
+                const adminRole = await interaction.guild.roles.fetch(adminRoleId)
+                if (adminRole) {
+                    this.logger.debug(adminRole.comparePositionTo(highestMemberRole))
+                    return highestMemberRole.comparePositionTo(adminRole) >= 0
+                } else {
+                    throw new InternalError("given admin role id appears to be invalid")
+                }
+            } else {
+                throw new InternalError('admin role was not configured')
+            }
+        } else {
+            throw new InternalError('Command should only be executed in a guild')
+        }
+    }
+
+    private async checkWhiteListPermission(interaction: CommandInteraction, command: Command): Promise<boolean> {
+        if (interaction.guild) {
+            const user = interaction.user
+
+            const commandRoles = command.listedRoles
+            const guildMember = await interaction.guild
+                .members
+                .fetch(user.id)
+            const userRoles = guildMember.roles.valueOf()
+            const intersection = userRoles.filter(role => commandRoles.includes(role.id))
+
+            return intersection.size > 0
         } else {
             throw new InternalError('Command should only be executed in a guild')
         }
