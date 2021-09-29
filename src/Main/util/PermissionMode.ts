@@ -1,4 +1,5 @@
 export enum PermissionMode {
     WHITELIST,
-    BLACKLIST
+    BLACKLIST,
+    ADMIN_ONLY
 }

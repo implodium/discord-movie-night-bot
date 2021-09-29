@@ -14,7 +14,7 @@ export default class MovieNightCommand extends Command {
         super()
         this.name = 'movie-night'
         this.description = 'starts movie night'
-        this.mode = PermissionMode.WHITELIST
+        this.mode = PermissionMode.ADMIN_ONLY
 
         this.addIntOption(new Option<number>(
             'in-days',

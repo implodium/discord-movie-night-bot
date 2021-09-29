@@ -9,6 +9,7 @@ import Logger from "../logger/Logger";
 import GuildConfigurations from "../config/GuildConfigurations";
 import {PermissionMode} from "../util/PermissionMode";
 import GuildConfiguration from "../config/GuildConfiguration";
+import InternalError from "../error/InternalError";
 
 @injectable()
 export default class CommandController {
@@ -29,10 +30,6 @@ export default class CommandController {
     private buildCommand(command: Command, guildConfig: GuildConfiguration): SlashCommandBuilder {
         const builder = new SlashCommandBuilder()
 
-        if (guildConfig.adminRoleId) {
-            command.addRoles(guildConfig.adminRoleId)
-        }
-
         if (command.name && command.description) {
             builder
                 .setName(command.name)
@@ -52,34 +49,54 @@ export default class CommandController {
         this.discordController.client.on('interactionCreate', async interaction => {
             if (interaction.isCommand()
                 && interaction.commandName === command.name
+                && await this.isPermittedFor(command, guildConfig, interaction)
             ) {
-                const commandInteraction = interaction as CommandInteraction
-                if (command.mode === PermissionMode.WHITELIST) {
-                    const user = commandInteraction.user
-
-                    if (interaction.guild) {
-                        const commandRoles = command.listedRoles
-                        const guildMember = await interaction.guild
-                            .members
-                            .fetch(user.id)
-                        const userRoles = guildMember.roles.valueOf()
-                        const intersection = userRoles.filter(role => commandRoles.includes(role.id))
-
-                        commandRoles.forEach(roleId => this.logger.debug(roleId))
-                        if (intersection.size > 0) {
-                            await command.exec(interaction)
-                        } else {
-                            await interaction.reply(
-                                'only one with permission ' +
-                                'may use this command'
-                            )
-                        }
-                    }
+                if (await this.isPermittedFor(command, guildConfig, interaction)) {
+                    await command.exec(interaction)
+                } else {
+                    await interaction.reply('You dont have the permission for this command')
                 }
             }
         })
 
         return builder
+    }
+
+    private async isPermittedFor(command: Command, guildConfig: GuildConfiguration, interaction: CommandInteraction): Promise<boolean> {
+        if (interaction.guild) {
+            const member = await interaction.guild.members.fetch(interaction.user.id)
+            const highestMemberRole = member.roles.highest
+            switch (command.mode) {
+                case PermissionMode.ADMIN_ONLY:
+                    const adminRoleId = guildConfig.adminRoleId
+                    if (adminRoleId) {
+                        const adminRole = await interaction.guild.roles.fetch(adminRoleId)
+                        if (adminRole) {
+                            this.logger.debug(adminRole.comparePositionTo(highestMemberRole))
+                            return highestMemberRole.comparePositionTo(adminRole) >= 0
+                        } else {
+                            throw new InternalError("given admin role id appears to be invalid")
+                        }
+                    } else {
+                        throw new InternalError('admin role was not configured')
+                    }
+                case PermissionMode.WHITELIST:
+                    const user = interaction.user
+
+                    const commandRoles = command.listedRoles
+                    const guildMember = await interaction.guild
+                        .members
+                        .fetch(user.id)
+                    const userRoles = guildMember.roles.valueOf()
+                    const intersection = userRoles.filter(role => commandRoles.includes(role.id))
+
+                    return intersection.size > 0
+                default:
+                    throw new InternalError('permission mode does not exist')
+            }
+        } else {
+            throw new InternalError('Command should only be executed in a guild')
+        }
     }
 
     private async initCommand(command: Command) {
