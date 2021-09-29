@@ -27,6 +27,16 @@ export default class CommandController {
         await this.initCommand(this.movieNightCommand)
     }
 
+    private async initCommand(command: Command) {
+        const guildConfigs: GuildConfigurations = this.configController.getConfig("guilds")
+        const builder = this.buildCommand(command)
+
+        for (const [id, guildConfig] of Object.entries(guildConfigs)) {
+            await this.addInteraction(command, guildConfig)
+            await this.refreshCommand(id, builder)
+        }
+    }
+
     private buildCommand(command: Command): SlashCommandBuilder {
         const builder = new SlashCommandBuilder()
 
@@ -51,6 +61,20 @@ export default class CommandController {
                         .setRequired(option.isRequired)
                 })
         }
+    }
+
+    private async addInteraction(command: Command, guildConfig: GuildConfiguration) {
+        this.discordController.client.on('interactionCreate', async interaction => {
+            if (interaction.isCommand()
+                && interaction.commandName === command.name
+            ) {
+                if (await this.isPermittedFor(command, guildConfig, interaction)) {
+                    await command.exec(interaction)
+                } else {
+                    await interaction.reply('You dont have the permission for this command')
+                }
+            }
+        })
     }
 
     private async isPermittedFor(command: Command, guildConfig: GuildConfiguration, interaction: CommandInteraction): Promise<boolean> {
@@ -107,33 +131,9 @@ export default class CommandController {
         }
     }
 
-    private async initCommand(command: Command) {
-        const guildConfigs: GuildConfigurations = this.configController.getConfig("guilds")
-        const builder = this.buildCommand(command)
-
-        for (const [id, guildConfig] of Object.entries(guildConfigs)) {
-            await this.addInteraction(command, guildConfig)
-            await this.refreshCommand(id, builder)
-        }
-    }
-
     private async refreshCommand(guildId: string, builder: SlashCommandBuilder): Promise<ApplicationCommand[]> {
         return await this.discordController
             .refreshCommands(guildId, [builder])
     }
 
-    private async addInteraction(command: Command, guildConfig: GuildConfiguration) {
-        this.discordController.client.on('interactionCreate', async interaction => {
-            if (interaction.isCommand()
-                && interaction.commandName === command.name
-            ) {
-                if (await this.isPermittedFor(command, guildConfig, interaction)) {
-                    await command.exec(interaction)
-                } else {
-                    await interaction.reply('You dont have the permission for this command')
-                }
-            }
-        })
-
-    }
 }
