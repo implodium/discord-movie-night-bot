@@ -77,7 +77,11 @@ export default class CommandController {
         })
     }
 
-    private async isPermittedFor(command: Command, guildConfig: GuildConfiguration, interaction: CommandInteraction): Promise<boolean> {
+    private async isPermittedFor(
+        command: Command,
+        guildConfig: GuildConfiguration,
+        interaction: CommandInteraction
+    ): Promise<boolean> {
         if (interaction.guild) {
             switch (command.mode) {
                 case PermissionMode.ADMIN_ONLY:
@@ -92,7 +96,10 @@ export default class CommandController {
         }
     }
 
-    private async checkAdminOnlyPermission(guildConfig: GuildConfiguration, interaction: CommandInteraction): Promise<boolean> {
+    private async checkAdminOnlyPermission(
+        guildConfig: GuildConfiguration,
+        interaction: CommandInteraction
+    ): Promise<boolean> {
         if (interaction.guild) {
             const member = await interaction.guild.members.fetch(interaction.user.id)
             const highestMemberRole = member.roles.highest
@@ -114,7 +121,10 @@ export default class CommandController {
         }
     }
 
-    private async checkWhiteListPermission(interaction: CommandInteraction, command: Command): Promise<boolean> {
+    private async checkWhiteListPermission(
+        interaction: CommandInteraction,
+        command: Command
+    ): Promise<boolean> {
         if (interaction.guild) {
             const user = interaction.user
 
@@ -131,7 +141,10 @@ export default class CommandController {
         }
     }
 
-    private async refreshCommand(guildId: string, builder: SlashCommandBuilder): Promise<ApplicationCommand[]> {
+    private async refreshCommand(
+        guildId: string,
+        builder: SlashCommandBuilder
+    ): Promise<ApplicationCommand[]> {
         return await this.discordController
             .refreshCommands(guildId, [builder])
     }
