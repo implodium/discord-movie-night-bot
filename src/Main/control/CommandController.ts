@@ -24,7 +24,7 @@ export default class CommandController {
     ) { }
 
     async init() {
-        this.initCommand(this.movieNightCommand)
+        await this.initCommand(this.movieNightCommand)
     }
 
     private buildCommand(command: Command): SlashCommandBuilder {
