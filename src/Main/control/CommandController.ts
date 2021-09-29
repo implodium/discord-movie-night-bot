@@ -34,8 +34,14 @@ export default class CommandController {
             builder
                 .setName(command.name)
                 .setDescription(command.description)
+
+            this.buildOptions(command, builder)
         }
 
+        return builder
+    }
+
+    private buildOptions(command: Command, builder: SlashCommandBuilder) {
         for (const option of command.intOptions) {
             builder
                 .addIntegerOption(optionProtocol => {
@@ -45,8 +51,6 @@ export default class CommandController {
                         .setRequired(option.isRequired)
                 })
         }
-
-        return builder
     }
 
     private async isPermittedFor(command: Command, guildConfig: GuildConfiguration, interaction: CommandInteraction): Promise<boolean> {
