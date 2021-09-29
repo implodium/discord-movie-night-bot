@@ -27,7 +27,7 @@ export default class CommandController {
         this.initCommand(this.movieNightCommand)
     }
 
-    private buildCommand(command: Command, guildConfig: GuildConfiguration): SlashCommandBuilder {
+    private buildCommand(command: Command): SlashCommandBuilder {
         const builder = new SlashCommandBuilder()
 
         if (command.name && command.description) {
@@ -45,18 +45,6 @@ export default class CommandController {
                         .setRequired(option.isRequired)
                 })
         }
-
-        this.discordController.client.on('interactionCreate', async interaction => {
-            if (interaction.isCommand()
-                && interaction.commandName === command.name
-            ) {
-                if (await this.isPermittedFor(command, guildConfig, interaction)) {
-                    await command.exec(interaction)
-                } else {
-                    await interaction.reply('You dont have the permission for this command')
-                }
-            }
-        })
 
         return builder
     }
@@ -117,9 +105,10 @@ export default class CommandController {
 
     private async initCommand(command: Command) {
         const guildConfigs: GuildConfigurations = this.configController.getConfig("guilds")
+        const builder = this.buildCommand(command)
 
         for (const [id, guildConfig] of Object.entries(guildConfigs)) {
-            const builder = this.buildCommand(command, guildConfig)
+            await this.addInteraction(command, guildConfig)
             await this.refreshCommand(id, builder)
         }
     }
@@ -127,5 +116,20 @@ export default class CommandController {
     private async refreshCommand(guildId: string, builder: SlashCommandBuilder): Promise<ApplicationCommand[]> {
         return await this.discordController
             .refreshCommands(guildId, [builder])
+    }
+
+    private async addInteraction(command: Command, guildConfig: GuildConfiguration) {
+        this.discordController.client.on('interactionCreate', async interaction => {
+            if (interaction.isCommand()
+                && interaction.commandName === command.name
+            ) {
+                if (await this.isPermittedFor(command, guildConfig, interaction)) {
+                    await command.exec(interaction)
+                } else {
+                    await interaction.reply('You dont have the permission for this command')
+                }
+            }
+        })
+
     }
 }
