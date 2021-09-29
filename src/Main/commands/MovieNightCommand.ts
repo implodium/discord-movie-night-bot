@@ -1,15 +1,20 @@
 import Command from "./Command";
 import Option from './Option'
 import {CommandInteraction} from "discord.js";
-import {injectable} from "inversify";
+import {inject, injectable} from "inversify";
+import {PermissionMode} from "../util/PermissionMode";
+import ConfigController from "../control/ConfigController";
 
 @injectable()
 export default class MovieNightCommand extends Command {
 
-    constructor() {
+    constructor(
+        @inject(ConfigController) private configController: ConfigController
+    ) {
         super()
         this.name = 'movie-night'
         this.description = 'starts movie night'
+        this.mode = PermissionMode.WHITELIST
 
         this.addIntOption(new Option<number>(
             'in-days',
