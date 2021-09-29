@@ -1,6 +1,7 @@
 import {inject, injectable} from "inversify";
 import ConfigController from "./ConfigController";
 import {
+    ApplicationCommand,
     Channel,
     Client,
     Collection,
@@ -16,6 +17,7 @@ import InternalError from "../error/InternalError";
 import Logger from "../logger/Logger";
 import {REST} from "@discordjs/rest";
 import {Routes} from "discord-api-types/v9";
+import App from "../App";
 
 @injectable()
 export default class DiscordController {
@@ -139,15 +141,20 @@ export default class DiscordController {
         })
     }
 
-    refreshCommands(guildId: string, commands: SlashCommandBuilder[]) {
-        const jsonCommands = commands
+    refreshCommands(guildId: string, commands: SlashCommandBuilder[]): Promise<ApplicationCommand[]> {
+        const jsonCommand = commands
             .map(command => command.toJSON())
 
         if (this._client.user && this._client.user.id) {
-            this._rest.put(
+            return this._rest.put(
                 Routes.applicationGuildCommands(this._client.user.id, guildId),
-                {body: jsonCommands}
+                {body: commands}
             )
+                .then(object => {
+                    return object as ApplicationCommand[]
+                })
+        } else {
+            throw new InternalError("client was not correctly initialized")
         }
     }
 }

@@ -1,10 +1,13 @@
 import {inject, injectable} from "inversify";
 import DiscordController from "./DiscordController";
 import ConfigController from "./ConfigController";
-import GuildConfiguration from "../config/GuildConfiguration";
 import {SlashCommandBuilder} from "@discordjs/builders";
 import Command from "../commands/Command";
 import MovieNightCommand from "../commands/MovieNightCommand";
+import {ApplicationCommand} from "discord.js";
+import Logger from "../logger/Logger";
+import GuildConfigurations from "../config/GuildConfigurations";
+import {PermissionMode} from "../util/PermissionMode";
 
 @injectable()
 export default class CommandController {
@@ -13,35 +16,23 @@ export default class CommandController {
 
     constructor(
         @inject(DiscordController) private discordController: DiscordController,
-        @inject(ConfigController) private configController: ConfigController
+        @inject(ConfigController) private configController: ConfigController,
+        @inject(MovieNightCommand) private movieNightCommand: MovieNightCommand,
+        @inject(Logger) private logger: Logger
     ) { }
 
-    init() {
-        this.initCommands()
-        this.refreshCommands()
+    async init() {
+        this.initCommand(this.movieNightCommand)
     }
 
-    refreshCommands() {
-        const guildConfigs: Record<string, GuildConfiguration> = this.configController.getConfig('guilds')
-
-        if (guildConfigs) {
-            for (const [id] of Object.entries(guildConfigs)) {
-                this.discordController.refreshCommands(id, this.commands)
-            }
-        }
-    }
-
-    private initCommands() {
-        const command = new MovieNightCommand()
-        this.initCommand(command)
-    }
-
-    private initCommand(command: Command) {
+    private buildCommand(command: Command): SlashCommandBuilder {
         const builder = new SlashCommandBuilder()
 
-        builder
-            .setName(command.name)
-            .setDescription(command.description)
+        if (command.name && command.description) {
+            builder
+                .setName(command.name)
+                .setDescription(command.description)
+        }
 
         for (const option of command.intOptions) {
             builder
@@ -61,6 +52,20 @@ export default class CommandController {
             }
         })
 
-        this.commands.push(builder)
+        return builder
+    }
+
+    private async initCommand(command: Command) {
+        const guildConfigs: GuildConfigurations = this.configController.getConfig("guilds")
+        const builder = this.buildCommand(command)
+
+        for (const [id, guildConfig] of Object.entries(guildConfigs)) {
+            await this.refreshCommand(id, builder, command)
+        }
+    }
+
+    private async refreshCommand(guildId: string, builder: SlashCommandBuilder, commnad: Command): Promise<ApplicationCommand[]> {
+        return await this.discordController
+            .refreshCommands(guildId, [builder])
     }
 }
