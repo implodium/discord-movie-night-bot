@@ -248,7 +248,11 @@ export default class AnnouncementController {
         })
     }
 
-    async scheduleMovieNightFinalDecisionAnnouncements(scheduleDate: Date, config: AnnouncementConfiguration, guildConfig: GuildConfiguration) {
+    async scheduleMovieNightFinalDecisionAnnouncements(
+        scheduleDate: Date,
+        config: AnnouncementConfiguration,
+        guildConfig: GuildConfiguration
+    ) {
         scheduler.scheduleJob(scheduleDate, async () => {
             if (config.announcementMessages
                 && config.announcementMessages.movieNightFinalDecision
@@ -263,7 +267,11 @@ export default class AnnouncementController {
         })
     }
 
-    async scheduleMovieNightStartAnnouncement(scheduleDate: Date, config: AnnouncementConfiguration, guildConfig: GuildConfiguration) {
+    async scheduleMovieNightStartAnnouncement(
+        scheduleDate: Date,
+        config: AnnouncementConfiguration,
+        guildConfig: GuildConfiguration
+    ) {
         scheduler.scheduleJob(scheduleDate, async () => {
             if (config.announcementMessages
                 && config.announcementMessages.movieNightStart
