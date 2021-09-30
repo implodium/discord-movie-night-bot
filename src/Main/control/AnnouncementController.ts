@@ -265,7 +265,7 @@ export default class AnnouncementController {
 
     async scheduleMovieNightStartAnnouncement(scheduleDate: Date, config: AnnouncementConfiguration, guildConfig: GuildConfiguration) {
         scheduler.scheduleJob(scheduleDate, async () => {
-            if (config.announcementMessagesa
+            if (config.announcementMessages
                 && config.announcementMessages.movieNightStart
                 && guildConfig.id
             ) {
