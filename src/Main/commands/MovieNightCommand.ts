@@ -1,13 +1,19 @@
 import Command from "./Command";
 import Option from './Option'
 import {CommandInteraction} from "discord.js";
-import {injectable} from "inversify";
+import {inject, injectable} from "inversify";
 import {PermissionMode} from "../util/PermissionMode";
+import MovieNightController from "../control/MovieNightController";
+import ConfigController from "../control/ConfigController";
+import GuildConfigurations from "../config/GuildConfigurations";
 
 @injectable()
 export default class MovieNightCommand extends Command {
 
-    constructor() {
+    constructor(
+        @inject(MovieNightController) private movieNightController: MovieNightController,
+        @inject(ConfigController) private configController: ConfigController
+    ) {
         super()
         this.name = 'movie-night'
         this.description = 'starts movie night'
@@ -24,6 +30,15 @@ export default class MovieNightCommand extends Command {
     async exec(interaction: CommandInteraction): Promise<void> {
         const inDays = interaction.options.getInteger('in-days')
         await interaction.reply(`${inDays}`)
+        const guildConfigs: GuildConfigurations = this.configController.getConfig('guilds')
+
+        if (interaction.guild && guildConfigs[interaction.guild.id]) {
+            await this.movieNightController.startMovieNight(
+                new Date(2021, 8, 30, 13, 38),
+                guildConfigs[interaction.guild.id]
+            )
+        }
+
     }
 
 }

@@ -6,6 +6,7 @@ import Logger from "./logger/Logger";
 import EventController from "./control/EventController";
 import AnnouncementController from "./control/AnnouncementController";
 import CommandController from "./control/CommandController";
+import MovieNightController from "./control/MovieNightController";
 
 @injectable()
 export default class App {
@@ -16,6 +17,7 @@ export default class App {
         @inject(EventController) private eventController: EventController,
         @inject(AnnouncementController) private announcementController: AnnouncementController,
         @inject(CommandController) private commandController: CommandController,
+        @inject(MovieNightController) private movieNightControlelr: MovieNightController,
         @inject(Logger) private log: Logger
     ) {
         this.init()

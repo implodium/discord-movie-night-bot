@@ -2,7 +2,7 @@ import AnnouncementMessagesConfiguration from "./AnnouncementMessagesConfigurati
 
 export default interface AnnouncementConfiguration {
     automatic?: boolean
-    announcementTime?: string
+    announcementTime?: number
     everyCount?: number
     every?: string
     day?: number

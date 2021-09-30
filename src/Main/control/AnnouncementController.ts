@@ -10,6 +10,7 @@ import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
 import GuildConfiguration from "../config/GuildConfiguration";
 import MovieNight from "../util/announcements/MovieNight";
 import * as cron from 'node-cron'
+import * as scheduler from 'node-schedule'
 import MovieNightFinalDecision from "../util/announcements/MovieNightFinalDecision";
 import MovieNightStart from "../util/announcements/MovieNightStart";
 
@@ -117,15 +118,29 @@ export default class AnnouncementController {
             const scheduleString = await AnnouncementController.getScheduleString(config, -config.announcementTime)
             cron.schedule(scheduleString, async () => {
                 const dateOfMovieNight = await this.getDate(config)
-                const embed = await this.announcementBuilderController.buildMovieNight(
+                this.sendMovieNight(
                     movieNight,
                     config,
-                    dateOfMovieNight
+                    dateOfMovieNight,
+                    outChannel
                 )
-
-                await outChannel.send({embeds: [embed]})
             })
         }
+    }
+
+    private async sendMovieNight(
+        movieNight: MovieNight,
+        config: AnnouncementConfiguration,
+        dateOfMovieNight: Date,
+        outChannel: TextChannel
+    ) {
+        const embed = await this.announcementBuilderController.buildMovieNight(
+            movieNight,
+            config,
+            dateOfMovieNight
+        )
+
+        await outChannel.send({embeds: [embed]})
     }
 
     // offset number of days before (-) or after (+) the movie night
@@ -210,5 +225,57 @@ export default class AnnouncementController {
         )
 
         await outChannel.send({embeds: [embed]})
+    }
+
+    async scheduleMovieNightAnnouncement(
+        scheduleDate: Date,
+        config : AnnouncementConfiguration,
+        guildConfig: GuildConfiguration,
+        dateOfMovieNight: Date
+    ) {
+        scheduler.scheduleJob(scheduleDate, async () => {
+            if (config.announcementMessages
+                && config.announcementMessages.movieNight
+                && guildConfig.id
+            ) {
+                await this.sendMovieNight(
+                    config.announcementMessages.movieNight,
+                    config,
+                    dateOfMovieNight,
+                    await this.getAnnouncementChannel(guildConfig.id, guildConfig)
+                )
+            }
+        })
+    }
+
+    async scheduleMovieNightFinalDecisionAnnouncements(scheduleDate: Date, config: AnnouncementConfiguration, guildConfig: GuildConfiguration) {
+        scheduler.scheduleJob(scheduleDate, async () => {
+            if (config.announcementMessages
+                && config.announcementMessages.movieNightFinalDecision
+                && guildConfig.id
+            ) {
+                await this.sendMovieNightFinalDecision(
+                    config,
+                    config.announcementMessages.movieNightFinalDecision,
+                    await this.getAnnouncementChannel(guildConfig.id, guildConfig)
+                )
+            }
+        })
+    }
+
+    async scheduleMovieNightStartAnnouncement(scheduleDate: Date, config: AnnouncementConfiguration, guildConfig: GuildConfiguration) {
+        scheduler.scheduleJob(scheduleDate, async () => {
+            if (config.announcementMessagesa
+                && config.announcementMessages.movieNightStart
+                && guildConfig.id
+            ) {
+                await this.sendMovieNightStart(
+                    config.announcementMessages.movieNightStart,
+                    config,
+                    guildConfig,
+                    await this.getAnnouncementChannel(guildConfig.id, guildConfig)
+                )
+            }
+        })
     }
 }
