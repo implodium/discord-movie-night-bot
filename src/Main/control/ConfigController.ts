@@ -5,7 +5,6 @@ import Logger from "../logger/Logger";
 import GuildConfigurations from "../config/GuildConfigurations";
 import GuildConfiguration from "../config/GuildConfiguration";
 import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
-import {resolve} from "inversify/lib/resolution/resolver";
 
 @injectable()
 export default class ConfigController {
@@ -70,16 +69,6 @@ export default class ConfigController {
     getAnnouncementRootConfig(): Promise<AnnouncementConfiguration> {
         return new Promise((resolveRoot) => {
             resolveRoot(this.getConfig('announcements'))
-        })
-    }
-
-    getAnnouncementConfigByGuildConfigId(guildConfigId: string): Promise<AnnouncementConfiguration> {
-        return new Promise((resolveConfig, reject) => {
-            const guildConfig: GuildConfiguration = this.getConfig(`guilds.${guildConfigId}`)
-
-            this.getAnnouncementConfigByGuildConfig(guildConfig)
-                .then(resolveConfig)
-                .catch(reject)
         })
     }
 }

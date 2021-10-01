@@ -14,12 +14,12 @@
     }
   },
   "announcements": {
-    "automatic": true,
+    "automatic": false,
     "announcementTime": 3,
     "everyCount": 1,
-    "time": "12:57",
+    "time": "11:20",
     "every": "week",
-    "day": 1,
+    "day": 5,
     "announcementMessages": {
       "movieNight": {
         "titleDefault": "Movie night: $date",
