@@ -14,10 +14,10 @@
     }
   },
   "announcements": {
-    "automatic": true,
+    "automatic": false,
     "announcementTime": 3,
     "everyCount": 1,
-    "time": "11:12",
+    "time": "11:20",
     "every": "week",
     "day": 5,
     "announcementMessages": {

@@ -2,8 +2,8 @@ import {inject, injectable} from "inversify";
 import Logger from "../logger/Logger";
 import ConfigController from "./ConfigController";
 import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
-import AnnouncementController from "./AnnouncementController";
 import GuildConfiguration from "../config/GuildConfiguration";
+import ScheduleController from "./ScheduleController";
 
 @injectable()
 export default class MovieNightController {
@@ -11,7 +11,7 @@ export default class MovieNightController {
     constructor(
         @inject(Logger) private logger: Logger,
         @inject(ConfigController) private configController: ConfigController,
-        @inject(AnnouncementController) private announcementController: AnnouncementController
+        @inject(ScheduleController) private scheduleController: ScheduleController
     ) {
     }
 
@@ -32,20 +32,20 @@ export default class MovieNightController {
         const movieNightFinalDecisionAnnouncementDate = new Date(date)
         movieNightFinalDecisionAnnouncementDate.setDate(date.getDate() - 1)
 
-        await this.announcementController.scheduleMovieNightAnnouncement(
+        await this.scheduleController.scheduleMovieNightAnnouncement(
             movieNightAnnouncementDate,
             announcementConfig,
             guildConfig,
             date
         )
 
-        await this.announcementController.scheduleMovieNightFinalDecisionAnnouncements(
+        await this.scheduleController.scheduleMovieNightFinalDecisionAnnouncements(
             movieNightFinalDecisionAnnouncementDate,
             announcementConfig,
             guildConfig
         )
 
-        await this.announcementController.scheduleMovieNightStartAnnouncement(
+        await this.scheduleController.scheduleMovieNightStartAnnouncement(
             date,
             announcementConfig,
             guildConfig
