@@ -1,44 +1,84 @@
 import Command from "./Command";
 import Option from './Option'
-import {CommandInteraction} from "discord.js";
+import {CommandInteraction, CommandInteractionOptionResolver} from "discord.js";
 import {inject, injectable} from "inversify";
 import {PermissionMode} from "../util/PermissionMode";
 import MovieNightController from "../control/MovieNightController";
 import ConfigController from "../control/ConfigController";
 import GuildConfigurations from "../config/GuildConfigurations";
+import Logger from "../logger/Logger";
 
 @injectable()
 export default class MovieNightCommand extends Command {
 
     constructor(
+        @inject(Logger) private logger: Logger,
         @inject(MovieNightController) private movieNightController: MovieNightController,
         @inject(ConfigController) private configController: ConfigController
     ) {
         super()
-        this.name = 'movie-night'
+        this.name = 'schedule-movie-night'
         this.description = 'starts movie night'
         this.mode = PermissionMode.ADMIN_ONLY
 
-        this.addIntOption(new Option<number>(
-            'in-days',
-            'movie night in hours from now',
-            false,
-            0
-        ))
+        this.addRequiredIntOption(
+            'day',
+            'day value of the date',
+        )
+
+        this.addRequiredIntOption(
+            'month',
+            'month value of the date',
+        )
+
+        this.addRequiredIntOption(
+            'year',
+            'year value of the date'
+        )
+
+        this.addRequiredIntOption(
+            'hour',
+            'hour value of the date'
+        )
+
+        this.addRequiredIntOption(
+            'minute',
+            'minute value of the date'
+        )
     }
 
     async exec(interaction: CommandInteraction): Promise<void> {
-        const inDays = interaction.options.getInteger('in-days')
-        await interaction.reply(`${inDays}`)
+        const date = MovieNightCommand.getDateFrom(interaction.options)
         const guildConfigs: GuildConfigurations = this.configController.getConfig('guilds')
+
+        this.logger.debug(date)
 
         if (interaction.guild && guildConfigs[interaction.guild.id]) {
             await this.movieNightController.startMovieNight(
-                new Date(2021, 8, 30, 13, 38),
+                date,
                 guildConfigs[interaction.guild.id]
             )
-        }
 
+            interaction.reply("movie night scheduled")
+        }
     }
 
+    addRequiredIntOption(name: string, description: string): void {
+        this.addIntOption(new Option<number>(
+            name,
+            description,
+            true
+        ))
+    }
+
+    private static getDateFrom(options: CommandInteractionOptionResolver) {
+        // (!) because values are required
+        return new Date(
+            options.getInteger('year')!,
+            options.getInteger('month')! - 1,
+            options.getInteger('day')!,
+            options.getInteger('hour')!,
+            options.getInteger('minute')!
+        )
+    }
 }
