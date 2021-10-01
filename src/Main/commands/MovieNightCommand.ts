@@ -59,7 +59,7 @@ export default class MovieNightCommand extends Command {
                 guildConfigs[interaction.guild.id]
             )
 
-            interaction.reply("movie night scheduled")
+            await interaction.reply("movie night scheduled")
         }
     }
 
