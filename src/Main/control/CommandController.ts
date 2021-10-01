@@ -3,7 +3,7 @@ import DiscordController from "./DiscordController";
 import ConfigController from "./ConfigController";
 import {SlashCommandBuilder} from "@discordjs/builders";
 import Command from "../commands/Command";
-import MovieNightCommand from "../commands/MovieNightCommand";
+import ScheduleMovieNightCommand from "../commands/ScheduleMovieNightCommand";
 import {ApplicationCommand, CommandInteraction} from "discord.js";
 import Logger from "../logger/Logger";
 import GuildConfigurations from "../config/GuildConfigurations";
@@ -19,12 +19,12 @@ export default class CommandController {
     constructor(
         @inject(DiscordController) private discordController: DiscordController,
         @inject(ConfigController) private configController: ConfigController,
-        @inject(MovieNightCommand) private movieNightCommand: MovieNightCommand,
+        @inject(ScheduleMovieNightCommand) private scheduleMovieNightCommand: ScheduleMovieNightCommand,
         @inject(Logger) private logger: Logger
     ) { }
 
     async init() {
-        await this.initCommand(this.movieNightCommand)
+        await this.initCommand(this.scheduleMovieNightCommand)
     }
 
     private async initCommand(command: Command) {
