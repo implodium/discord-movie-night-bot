@@ -16,6 +16,7 @@ export default class MovieNightController {
     }
 
     async startMovieNight(date: Date, guildConfig: GuildConfiguration) {
+        this.logger.info('scheduling new movie night on ' + date.toLocaleString())
         const announcementConfig: AnnouncementConfiguration = await this
             .configController
             .getAnnouncementConfigByGuildConfig(guildConfig)

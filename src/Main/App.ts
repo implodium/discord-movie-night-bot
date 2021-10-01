@@ -6,7 +6,7 @@ import Logger from "./logger/Logger";
 import EventController from "./control/EventController";
 import AnnouncementController from "./control/AnnouncementController";
 import CommandController from "./control/CommandController";
-import MovieNightController from "./control/MovieNightController";
+import ScheduleController from "./control/ScheduleController";
 
 @injectable()
 export default class App {
@@ -17,7 +17,7 @@ export default class App {
         @inject(EventController) private eventController: EventController,
         @inject(AnnouncementController) private announcementController: AnnouncementController,
         @inject(CommandController) private commandController: CommandController,
-        @inject(MovieNightController) private movieNightControlelr: MovieNightController,
+        @inject(ScheduleController) private scheduleController: ScheduleController,
         @inject(Logger) private log: Logger
     ) {
         this.init()
@@ -52,6 +52,8 @@ export default class App {
                 this.commandController.init()
                 this.eventController.errors
                     .subscribe(this.handleError)
+                this.scheduleController.init()
+                    .catch(resolve)
                 const user = this.discordController.client.user
                 if (user) {
                     this.log.info(`logged in as ${user.tag}`)

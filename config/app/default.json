@@ -17,9 +17,9 @@
     "automatic": true,
     "announcementTime": 3,
     "everyCount": 1,
-    "time": "8:25",
+    "time": "11:12",
     "every": "week",
-    "day": 4,
+    "day": 5,
     "announcementMessages": {
       "movieNight": {
         "titleDefault": "Movie night: $date",
