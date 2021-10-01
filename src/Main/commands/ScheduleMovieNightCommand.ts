@@ -9,7 +9,7 @@ import GuildConfigurations from "../config/GuildConfigurations";
 import Logger from "../logger/Logger";
 
 @injectable()
-export default class MovieNightCommand extends Command {
+export default class ScheduleMovieNightCommand extends Command {
 
     constructor(
         @inject(Logger) private logger: Logger,
@@ -48,7 +48,7 @@ export default class MovieNightCommand extends Command {
     }
 
     async exec(interaction: CommandInteraction): Promise<void> {
-        const date = MovieNightCommand.getDateFrom(interaction.options)
+        const date = ScheduleMovieNightCommand.getDateFrom(interaction.options)
         const guildConfigs: GuildConfigurations = this.configController.getConfig('guilds')
 
         this.logger.debug(date)
