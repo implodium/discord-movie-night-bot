@@ -46,6 +46,7 @@ export default class App {
             this.discordController.client.on('ready', () => {
                 this.eventController.initEvents()
                 this.commandController.init()
+                    .catch(reject)
                 this.eventController.errors
                     .subscribe(this.handleError)
                 this.autoScheduleController.init()

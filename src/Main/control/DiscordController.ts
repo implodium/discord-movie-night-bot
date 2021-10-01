@@ -17,7 +17,6 @@ import InternalError from "../error/InternalError";
 import Logger from "../logger/Logger";
 import {REST} from "@discordjs/rest";
 import {Routes} from "discord-api-types/v9";
-import App from "../App";
 
 @injectable()
 export default class DiscordController {
@@ -148,7 +147,7 @@ export default class DiscordController {
         if (this._client.user && this._client.user.id) {
             return this._rest.put(
                 Routes.applicationGuildCommands(this._client.user.id, guildId),
-                {body: commands}
+                {body: jsonCommand}
             )
                 .then(object => {
                     return object as ApplicationCommand[]
