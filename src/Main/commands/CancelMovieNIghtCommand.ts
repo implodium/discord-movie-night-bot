@@ -26,6 +26,10 @@ export default class CancelMovieNIghtCommand extends Command {
                 .get(interaction.guildId)
 
             if (scheduledGuildMovies) {
+                scheduledGuildMovies.sort((s1, s2) => {
+                    return s1.date < s2.date ? 1 : -1
+                })
+
                 const canceledMovieNight = scheduledGuildMovies.pop()
                 if (canceledMovieNight) {
                     canceledMovieNight.movieNightJob.cancel()
