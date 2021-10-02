@@ -36,4 +36,17 @@ export default class DateUtil {
         return this.getDaysBetween(new Date(), date)
     }
 
+    getDateStringOf(date: Date) {
+        const timeString = date.toLocaleTimeString(
+            'de-DE',
+            {hour: "numeric", minute: "numeric"}
+        )
+
+        const dateString = date.toLocaleDateString(
+            'de-DE',
+        )
+
+        return `${dateString} ${timeString}`
+    }
+
 }
