@@ -21,42 +21,17 @@ export default class CancelMovieNIghtCommand extends Command {
 
     async exec(interaction: CommandInteraction): Promise<void> {
         if (interaction.guildId) {
-            const scheduledGuildMovies = this.movieNightController
-                .schedulesMovieNights
-                .get(interaction.guildId)
-
-            if (scheduledGuildMovies) {
-                scheduledGuildMovies.sort((s1, s2) => {
-                    return s1.date < s2.date ? 1 : -1
-                })
-
-                const canceledMovieNight = scheduledGuildMovies.pop()
-                if (canceledMovieNight) {
-                    canceledMovieNight.movieNightJob.cancel()
-                    canceledMovieNight.movieNightStartJob.cancel()
-                    canceledMovieNight.movieNightFinalDecisionJob.cancel()
-
-                    const canceledMovieNightDate = canceledMovieNight.date.toLocaleDateString('de-DE')
-                    const canceledMovieNightTime = canceledMovieNight.date.toLocaleTimeString('de-DE', {
-                        hour: 'numeric',
-                        minute: 'numeric'
-                    })
-                    const canceledMovieNightDateTime = `${canceledMovieNightDate} ${canceledMovieNightTime}`
-                    await interaction.reply(`canceled movie night scheduled on ${canceledMovieNightDateTime}`)
-                } else {
-                    await interaction.reply('there is no movieNight to cancel')
-                }
-            } else {
-                await interaction.reply(
-                    'something went wrong pease ask ' +
-                    'someone to check the logs or check them yourself'
+            try {
+                this.movieNightController.cancelNextMovieNight(
+                    interaction.guildId,
+                    1
                 )
-                this.logger.error('scheduled guild movies has not been initialized')
-                this.logger.error('the cause of this could be that the guild itself is not initialized')
+
+                await interaction.reply('canceled next movie night')
+            } catch (e) {
+                this.logger.error(e)
+                await interaction.reply('no movie night left to cancel')
             }
-        } else {
-            await interaction.reply('this command only works in guilds')
-            this.logger.error('this command only works in guilds')
         }
     }
 }

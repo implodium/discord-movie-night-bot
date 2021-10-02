@@ -6,6 +6,7 @@ import GuildConfiguration from "../config/GuildConfiguration";
 import ScheduleController from "./ScheduleController";
 import ScheduledMovieNight from "../util/ScheduledMovieNight";
 import GuildConfigurations from "../config/GuildConfigurations";
+import InternalError from "../error/InternalError";
 
 @injectable()
 export default class MovieNightController {
@@ -79,6 +80,42 @@ export default class MovieNightController {
                     movieNightStartJob
                 })
             }
+        }
+    }
+
+    cancelNextMovieNight(guildId: string, deletes: number = 1) {
+        const movieNights = this.sortMovieNights(guildId)
+        let index = 0
+
+        while (index <= deletes) {
+            movieNights.pop()
+            index++
+        }
+    }
+
+    cancelMovieNightSchedules(scheduledMovieNight: ScheduledMovieNight) {
+        scheduledMovieNight.movieNightJob.cancel()
+        scheduledMovieNight.movieNightStartJob.cancel()
+        scheduledMovieNight.movieNightFinalDecisionJob.cancel()
+    }
+
+    sortMovieNights(guildId: string) {
+        const guildMovieNights = this.getGuildMovieNights(guildId)
+
+        guildMovieNights.sort((s1, s2) => {
+            return s1.date < s2.date ? 1 : -1
+        })
+
+        return guildMovieNights
+    }
+
+    getGuildMovieNights(guildId: string) {
+        const guildMovieNights = this.schedulesMovieNights.get(guildId)
+
+        if (guildMovieNights) {
+            return guildMovieNights
+        } else {
+            throw new InternalError('guildMovieNight not initialized')
         }
     }
 
