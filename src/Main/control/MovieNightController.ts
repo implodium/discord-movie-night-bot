@@ -76,7 +76,6 @@ export default class MovieNightController {
         movieNightEvent.subscribe({
             complete: () => {
                 if (guildConfig.id) {
-                    this.logger.debug("is now completing the next movie night")
                     this.cancelNextMovieNight(guildConfig.id)
                 } else {
                     throw new InternalError('id was not set in configuration')
