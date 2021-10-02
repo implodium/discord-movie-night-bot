@@ -5,6 +5,7 @@ import GuildConfiguration from "../config/GuildConfiguration";
 import Logger from "../logger/Logger";
 import AnnouncementController from "./AnnouncementController";
 import * as scheduler from "node-schedule";
+import {Job} from "node-schedule";
 
 @injectable()
 export default class ScheduleController {
@@ -16,13 +17,13 @@ export default class ScheduleController {
     ) {
     }
 
-    async scheduleMovieNightAnnouncement(
+    scheduleMovieNightAnnouncement(
         scheduleDate: Date,
         config : AnnouncementConfiguration,
         guildConfig: GuildConfiguration,
         dateOfMovieNight: Date
-    ) {
-        scheduler.scheduleJob(scheduleDate, async () => {
+    ): any {
+        return this.scheduleJob('movieNight', scheduleDate, async() => {
             if (config.announcementMessages
                 && config.announcementMessages.movieNight
                 && guildConfig.id
@@ -37,12 +38,12 @@ export default class ScheduleController {
         })
     }
 
-    async scheduleMovieNightFinalDecisionAnnouncements(
+    scheduleMovieNightFinalDecisionAnnouncements(
         scheduleDate: Date,
         config: AnnouncementConfiguration,
         guildConfig: GuildConfiguration
-    ) {
-        scheduler.scheduleJob(scheduleDate, async () => {
+    ): Job {
+        return this.scheduleJob('movieNightFinalDecision',scheduleDate, async () => {
             if (config.announcementMessages
                 && config.announcementMessages.movieNightFinalDecision
                 && guildConfig.id
@@ -56,12 +57,12 @@ export default class ScheduleController {
         })
     }
 
-    async scheduleMovieNightStartAnnouncement(
+    scheduleMovieNightStartAnnouncement(
         scheduleDate: Date,
         config: AnnouncementConfiguration,
         guildConfig: GuildConfiguration
-    ) {
-        scheduler.scheduleJob(scheduleDate, async () => {
+    ): Job {
+        return this.scheduleJob('movieNightStart', scheduleDate, async () => {
             if (config.announcementMessages
                 && config.announcementMessages.movieNightStart
                 && guildConfig.id
@@ -73,5 +74,10 @@ export default class ScheduleController {
                 )
             }
         })
+    }
+
+    scheduleJob(jobName: string, date: Date, callBack: () => void): Job {
+        scheduler.scheduleJob(jobName, date, callBack)
+        return scheduler.scheduledJobs[jobName]
     }
 }
