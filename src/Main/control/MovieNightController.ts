@@ -4,6 +4,7 @@ import ConfigController from "./ConfigController";
 import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
 import GuildConfiguration from "../config/GuildConfiguration";
 import ScheduleController from "./ScheduleController";
+import {Subject} from "rxjs";
 import ScheduledMovieNight from "../util/ScheduledMovieNight";
 import GuildConfigurations from "../config/GuildConfigurations";
 import InternalError from "../error/InternalError";
@@ -35,6 +36,7 @@ export default class MovieNightController {
     }
 
     async startMovieNight(date: Date, guildConfig: GuildConfiguration) {
+        const movieNightEvent = new Subject<void>()
         this.logger.info('scheduling new movie night on ' + date.toLocaleString())
         const announcementConfig: AnnouncementConfiguration = await this
             .configController
@@ -67,8 +69,20 @@ export default class MovieNightController {
         const movieNightStartJob = this.scheduleController.scheduleMovieNightStartAnnouncement(
             date,
             announcementConfig,
-            guildConfig
+            guildConfig,
+            movieNightEvent,
         )
+
+        movieNightEvent.subscribe({
+            complete: () => {
+                if (guildConfig.id) {
+                    this.logger.debug("is now completing the next movie night")
+                    this.cancelNextMovieNight(guildConfig.id)
+                } else {
+                    throw new InternalError('id was not set in configuration')
+                }
+            }
+        })
 
         if (guildConfig.id) {
             const scheduledGuildMovies = this.schedulesMovieNights.get(guildConfig.id)
@@ -77,7 +91,8 @@ export default class MovieNightController {
                     date,
                     movieNightJob,
                     movieNightFinalDecisionJob,
-                    movieNightStartJob
+                    movieNightStartJob,
+                    event: movieNightEvent
                 })
             }
         }

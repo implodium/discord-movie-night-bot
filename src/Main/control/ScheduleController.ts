@@ -6,6 +6,7 @@ import Logger from "../logger/Logger";
 import AnnouncementController from "./AnnouncementController";
 import * as scheduler from "node-schedule";
 import {Job} from "node-schedule";
+import {Subject} from "rxjs";
 
 @injectable()
 export default class ScheduleController {
@@ -60,7 +61,8 @@ export default class ScheduleController {
     scheduleMovieNightStartAnnouncement(
         scheduleDate: Date,
         config: AnnouncementConfiguration,
-        guildConfig: GuildConfiguration
+        guildConfig: GuildConfiguration,
+        movieNightEvent: Subject<void>
     ): Job {
         return this.scheduleJob('movieNightStart', scheduleDate, async () => {
             if (config.announcementMessages
@@ -72,6 +74,8 @@ export default class ScheduleController {
                     config,
                     guildConfig,
                 )
+
+                movieNightEvent.complete()
             }
         })
     }
