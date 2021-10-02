@@ -11,6 +11,7 @@ import {PermissionMode} from "../util/PermissionMode";
 import GuildConfiguration from "../config/GuildConfiguration";
 import InternalError from "../error/InternalError";
 import CancelMovieNIghtCommand from "../commands/CancelMovieNIghtCommand";
+import ListMovieNightCommand from "../commands/ListMovieNightCommand";
 
 @injectable()
 export default class CommandController {
@@ -22,13 +23,15 @@ export default class CommandController {
         @inject(ConfigController) private configController: ConfigController,
         @inject(ScheduleMovieNightCommand) private scheduleMovieNightCommand: ScheduleMovieNightCommand,
         @inject(CancelMovieNIghtCommand) private cancelMovieNightCommand: CancelMovieNIghtCommand,
+        @inject(ListMovieNightCommand) private listMovieNightCommand: ListMovieNightCommand,
         @inject(Logger) private logger: Logger
     ) { }
 
     async init() {
         const commandInit = Promise.all([
             this.initCommand(this.scheduleMovieNightCommand),
-            this.initCommand(this.cancelMovieNightCommand)
+            this.initCommand(this.cancelMovieNightCommand),
+            this.initCommand(this.listMovieNightCommand)
         ])
 
         await commandInit
