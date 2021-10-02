@@ -6,6 +6,7 @@ import Logger from "./logger/Logger";
 import EventController from "./control/EventController";
 import CommandController from "./control/CommandController";
 import AutoScheduleController from "./control/AutoScheduleController";
+import MovieNightController from "./control/MovieNightController";
 
 @injectable()
 export default class App {
@@ -16,6 +17,7 @@ export default class App {
         @inject(EventController) private eventController: EventController,
         @inject(CommandController) private commandController: CommandController,
         @inject(AutoScheduleController) private autoScheduleController: AutoScheduleController,
+        @inject(MovieNightController) private movieNightController: MovieNightController,
         @inject(Logger) private log: Logger
     ) {
         this.init()
@@ -51,6 +53,7 @@ export default class App {
                     .subscribe(this.handleError)
                 this.autoScheduleController.init()
                     .catch(resolve)
+                this.movieNightController.init()
                 const user = this.discordController.client.user
                 if (user) {
                     this.log.info(`logged in as ${user.tag}`)

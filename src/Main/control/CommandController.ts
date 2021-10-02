@@ -10,30 +10,38 @@ import GuildConfigurations from "../config/GuildConfigurations";
 import {PermissionMode} from "../util/PermissionMode";
 import GuildConfiguration from "../config/GuildConfiguration";
 import InternalError from "../error/InternalError";
+import CancelMovieNIghtCommand from "../commands/CancelMovieNIghtCommand";
 
 @injectable()
 export default class CommandController {
 
-    commands: SlashCommandBuilder[] = []
+    commandBuilders: SlashCommandBuilder[] = []
 
     constructor(
         @inject(DiscordController) private discordController: DiscordController,
         @inject(ConfigController) private configController: ConfigController,
         @inject(ScheduleMovieNightCommand) private scheduleMovieNightCommand: ScheduleMovieNightCommand,
+        @inject(CancelMovieNIghtCommand) private cancelMovieNightCommand: CancelMovieNIghtCommand,
         @inject(Logger) private logger: Logger
     ) { }
 
     async init() {
-        await this.initCommand(this.scheduleMovieNightCommand)
+        const commandInit = Promise.all([
+            this.initCommand(this.scheduleMovieNightCommand),
+            this.initCommand(this.cancelMovieNightCommand)
+        ])
+
+        await commandInit
+        this.logger.info('command initialized')
     }
 
     private async initCommand(command: Command) {
         const guildConfigs: GuildConfigurations = this.configController.getConfig("guilds")
-        const builder = this.buildCommand(command)
+        this.buildCommand(command)
 
         for (const [id, guildConfig] of Object.entries(guildConfigs)) {
             await this.addInteraction(command, guildConfig)
-            await this.refreshCommand(id, builder)
+            await this.refreshCommand(id)
         }
     }
 
@@ -48,6 +56,7 @@ export default class CommandController {
             this.buildOptions(command, builder)
         }
 
+        this.commandBuilders.push(builder)
         return builder
     }
 
@@ -142,11 +151,10 @@ export default class CommandController {
     }
 
     private async refreshCommand(
-        guildId: string,
-        builder: SlashCommandBuilder
+        guildId: string
     ): Promise<ApplicationCommand[]> {
         return await this.discordController
-            .refreshCommands(guildId, [builder])
+            .refreshCommands(guildId, this.commandBuilders)
     }
 
 }
