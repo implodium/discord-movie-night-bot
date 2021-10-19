@@ -7,6 +7,7 @@ import EventController from "./control/EventController";
 import CommandController from "./control/CommandController";
 import AutoScheduleController from "./control/AutoScheduleController";
 import MovieNightController from "./control/MovieNightController";
+import InternalError from "./error/InternalError";
 
 @injectable()
 export default class App {
@@ -21,6 +22,35 @@ export default class App {
         @inject(Logger) private log: Logger
     ) {
         this.init()
+    }
+
+    init() {
+        this.log.info("Starting up ...")
+        this.discordController.client.on('ready', async () => {
+            try {
+                this.syncInit()
+                await this.asyncInit()
+                this.printWelcomingMessage()
+            } catch (error) {
+                this.handleError(error)
+            }
+        })
+    }
+
+    syncInit() {
+        this.eventController.initEvents()
+        this.movieNightController.init()
+        this.eventController.errors
+            .subscribe(this.handleError)
+    }
+
+    asyncInit(): Promise<[void, void, void, void]> {
+        return Promise.all([
+            this.commandController.init(),
+            this.autoScheduleController.init(),
+            this.votingController.updateMostVoted(),
+            this.votingController.initVotingSystem()
+        ])
     }
 
     handleError(err: any) {
@@ -39,31 +69,14 @@ export default class App {
                 this.log.error(err.stack)
             }
         }
-
     }
 
-    init() {
-        this.log.info("Starting up ...")
-        new Promise((resolve, reject) => {
-            this.discordController.client.on('ready', () => {
-                this.eventController.initEvents()
-                this.commandController.init()
-                    .catch(reject)
-                this.eventController.errors
-                    .subscribe(this.handleError)
-                this.autoScheduleController.init()
-                    .catch(resolve)
-                this.movieNightController.init()
-                const user = this.discordController.client.user
-                if (user) {
-                    this.log.info(`logged in as ${user.tag}`)
-                    this.votingController.updateMostVoted()
-                        .catch(reject)
-
-                    this.votingController.initVotingSystem()
-                        .catch(reject)
-                }
-            })
-        }).catch((err) => this.handleError(err))
+    printWelcomingMessage(): void {
+        const user = this.discordController.client.user
+        if (user) {
+            this.log.info(`logged in as ${user.tag}`)
+        } else {
+            throw new InternalError('client failed to initialize')
+        }
     }
 }
