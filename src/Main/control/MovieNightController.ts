@@ -6,7 +6,6 @@ import GuildConfiguration from "../config/GuildConfiguration";
 import ScheduleController from "./ScheduleController";
 import {Subject} from "rxjs";
 import ScheduledMovieNight from "../util/ScheduledMovieNight";
-import GuildConfigurations from "../config/GuildConfigurations";
 import InternalError from "../error/InternalError";
 
 @injectable()
@@ -21,18 +20,10 @@ export default class MovieNightController {
     ) {
     }
 
-    init() {
-        const guildConfigs: GuildConfigurations = this.configController.getConfig('guilds')
-
-        for (const [id] of Object.entries(guildConfigs)) {
-            this.initGuild(id)
+    initGuild(guildConfig: GuildConfiguration) {
+        if (guildConfig.id) {
+            this.schedulesMovieNights.set(guildConfig.id, [])
         }
-
-        this.logger.info('initialized movie night controller')
-    }
-
-    initGuild(guildId: string) {
-        this.schedulesMovieNights.set(guildId, [])
     }
 
     async startMovieNight(date: Date, guildConfig: GuildConfiguration) {
