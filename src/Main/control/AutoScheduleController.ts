@@ -1,33 +1,29 @@
 import {inject, injectable} from "inversify";
-import GuildConfigurations from "../config/GuildConfigurations";
 import AnnouncementConfiguration from "../config/AnnouncementConfiguration";
 import GuildConfiguration from "../config/GuildConfiguration";
 import * as cron from "node-cron";
 import InternalError from "../error/InternalError";
 import MovieNightController from "./MovieNightController";
 import ConfigController from "./ConfigController";
+import Logger from "../logger/Logger";
 
 @injectable()
 export default class AutoScheduleController {
 
     constructor(
+        @inject(Logger) private logger: Logger,
         @inject(ConfigController) private configController: ConfigController,
         @inject(MovieNightController) private movieNightController: MovieNightController
     ) { }
 
-
-    async init() {
-        const guildConfigs: GuildConfigurations = this.configController.getConfig('guilds')
-
-        for (const [, guildConfig] of Object.entries(guildConfigs)) {
-            const announcementConfig = await this.configController
-                .getAnnouncementConfigByGuildConfig(guildConfig)
-            await this.initScheduler(announcementConfig, guildConfig)
-        }
+    async initGuild(guildConfig: GuildConfiguration) {
+        const announcementConfig = await this.configController
+            .getAnnouncementConfigByGuildConfig(guildConfig)
+        await this.initScheduler(announcementConfig, guildConfig)
     }
 
     async initScheduler(config: AnnouncementConfiguration, guildConfig: GuildConfiguration) {
-        if (config.automatic && config && config.everyCount){
+        if (config.automatic !== null && config && config.everyCount){
             if (config.automatic) {
                 const scheduleString = await AutoScheduleController.getScheduleString(config)
                 cron.schedule(scheduleString, async () => {

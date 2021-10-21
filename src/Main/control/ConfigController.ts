@@ -71,4 +71,8 @@ export default class ConfigController {
             resolveRoot(this.getConfig('announcements'))
         })
     }
+
+    getConfigurationByGuildId(guildId: string): GuildConfiguration {
+        return this.getConfig(`guilds.${guildId}`)
+    }
 }

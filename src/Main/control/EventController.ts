@@ -4,6 +4,7 @@ import VotingController from "./VotingController";
 import {Client, MessageReaction, PartialMessageReaction, PartialUser, TextChannel, User} from "discord.js";
 import Logger from "../logger/Logger";
 import {Observable, Subject} from "rxjs";
+import ConfigController from "./ConfigController";
 
 @injectable()
 export default class EventController {
@@ -14,6 +15,7 @@ export default class EventController {
     constructor(
         @inject(DiscordController) private discordController: DiscordController,
         @inject(VotingController) private votingController: VotingController,
+        @inject(ConfigController) private configController: ConfigController,
         @inject(Logger) private logger: Logger
     ) {
         this.discordClient = discordController.client
@@ -22,8 +24,9 @@ export default class EventController {
     initEvents() {
         this.logger.info("initiated events")
 
-        this.discordClient.on('guildCreate', () => {
-            this.votingController.initVotingSystem()
+        this.discordClient.on('guildCreate', guild => {
+            const guildConfig = this.configController.getConfigurationByGuildId(guild.id)
+            this.votingController.initGuild(guildConfig)
                 .catch(this._errors.next)
         })
 
@@ -54,6 +57,7 @@ export default class EventController {
     private reactionUpdate(reaction: MessageReaction | PartialMessageReaction, user: User | PartialUser) {
         const channel = reaction.message.channel as TextChannel
         const guild = channel.guild
+        const guildConfig = this.configController.getConfigurationByGuildId(guild.id)
 
         if (this.votingController.isVotingChannel(channel, guild)
             && this.discordClient.user
@@ -61,7 +65,7 @@ export default class EventController {
             && reaction.emoji.name
             && ['👍', '👎'].includes(reaction.emoji.name)
         ) {
-            this.votingController.updateMostVoted()
+            this.votingController.updateMostVoted(guildConfig)
                 .catch(this._errors.next)
         }
     }

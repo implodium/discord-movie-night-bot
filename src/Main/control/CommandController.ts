@@ -6,7 +6,6 @@ import Command from "../commands/Command";
 import ScheduleMovieNightCommand from "../commands/ScheduleMovieNightCommand";
 import {ApplicationCommand, CommandInteraction} from "discord.js";
 import Logger from "../logger/Logger";
-import GuildConfigurations from "../config/GuildConfigurations";
 import {PermissionMode} from "../util/PermissionMode";
 import GuildConfiguration from "../config/GuildConfiguration";
 import InternalError from "../error/InternalError";
@@ -27,24 +26,20 @@ export default class CommandController {
         @inject(Logger) private logger: Logger
     ) { }
 
-    async init() {
-        const commandInit = Promise.all([
-            this.initCommand(this.scheduleMovieNightCommand),
-            this.initCommand(this.cancelMovieNightCommand),
-            this.initCommand(this.listMovieNightCommand)
+    async initGuild(guildConfig: GuildConfiguration) {
+        return Promise.all([
+            this.initCommand(this.scheduleMovieNightCommand, guildConfig),
+            this.initCommand(this.cancelMovieNightCommand, guildConfig),
+            this.initCommand(this.listMovieNightCommand, guildConfig)
         ])
-
-        await commandInit
-        this.logger.info('command initialized')
     }
 
-    private async initCommand(command: Command) {
-        const guildConfigs: GuildConfigurations = this.configController.getConfig("guilds")
+    private async initCommand(command: Command, guildConfig: GuildConfiguration) {
         this.buildCommand(command)
 
-        for (const [id, guildConfig] of Object.entries(guildConfigs)) {
+        if (guildConfig.id) {
             await this.addInteraction(command, guildConfig)
-            await this.refreshCommand(id)
+            await this.refreshCommand(guildConfig.id)
         }
     }
 
