@@ -4,6 +4,7 @@ import ConfigController from "./ConfigController";
 import * as fs from 'fs'
 import InternalError from "../error/InternalError";
 import Logger from "../logger/Logger";
+import UserError from "../error/UserError";
 
 @injectable()
 export default class StorageController {
@@ -34,6 +35,18 @@ export default class StorageController {
                 })
                 .catch(reject)
         })
+    }
+
+    async clearWinnerMessageId(guildId: string): Promise<Storage> {
+        const [fileLocation, storage] = await Promise.all([this.getFileLocation(), this.get()])
+
+        if (fileLocation && storage && storage.winnerMessageIds) {
+            delete storage.winnerMessageIds[guildId]
+            await this.write(storage)
+            return storage
+        } else {
+            throw new UserError("storage not found", guildId)
+        }
     }
 
     write(storage: Storage): Promise<void> {
