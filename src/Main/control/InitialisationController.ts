@@ -23,20 +23,18 @@ export default class InitialisationController {
         @inject(CommandController) private commandController: CommandController,
         @inject(AutoScheduleController) private autoScheduleController: AutoScheduleController,
         @inject(VotingController) private votingController: VotingController,
-        @inject(DiscordController) private discordController: DiscordController
+        @inject(DiscordController) private discordController: DiscordController,
     ) {
     }
 
     init() {
-        this.discordController.client.on('ready', async () => {
-            try {
-                this.systemInit()
-                this.guildsInit()
-                this.printWelcomingMessage()
-            } catch (error) {
-                this.handleError(error)
-            }
-        })
+        try {
+            this.systemInit()
+            this.guildsInit()
+            this.printWelcomingMessage()
+        } catch (error) {
+            this.handleError(error)
+        }
     }
 
     private systemInit() {
