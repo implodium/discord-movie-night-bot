@@ -7,6 +7,7 @@ import {VoteDisplayType} from "../util/VoteDisplayType";
 import DiscordController from "./DiscordController";
 import {GuildChannel, MessageEmbed, TextChannel} from "discord.js";
 import StorageController from "./StorageController";
+import Storage from "../data/Storage";
 
 @injectable()
 export default class VotingDisplayController {
@@ -114,14 +115,14 @@ export default class VotingDisplayController {
                         if (winningTextChannel) {
                             this.storageController.get()
                                 .then(storage => {
-                                    if (storage.winnerMessageId) {
+                                    if (storage.winnerMessageIds && guildConfig.id && storage.winnerMessageIds[guildConfig.id]) {
                                         this.logger.info("updating message")
-                                        this.updateDisplayMessage(winningTextChannel, storage.winnerMessageId, votingResult)
+                                        this.updateDisplayMessage(winningTextChannel, storage.winnerMessageIds[guildConfig.id], votingResult)
                                             .then(() => resolve())
                                             .catch(reject)
                                     } else {
                                         this.logger.info("sending message")
-                                        this.sendDisplayMessage(winningTextChannel, votingResult)
+                                        this.sendDisplayMessage(winningTextChannel, votingResult, guildConfig)
                                             .then(() => resolve)
                                             .catch(reject)
                                     }
@@ -133,15 +134,22 @@ export default class VotingDisplayController {
         })
     }
 
-    private sendDisplayMessage(textChannel: TextChannel, votingResult: Map<string, number>): Promise<void> {
+    private sendDisplayMessage(textChannel: TextChannel, votingResult: Map<string, number>, guildConfig: GuildConfiguration): Promise<void> {
         return new Promise((resolve, reject) => {
             textChannel.send({embeds: [this.getEmbed(votingResult)]})
                 .then(message => {
-                    this.storageController.write({
-                        winnerMessageId: message.id
-                    })
-                        .then(() => resolve())
-                        .catch(reject)
+                    const storage: Storage = {
+                        winnerMessageIds: {}
+                    }
+
+                    if (storage.winnerMessageIds && guildConfig.id) {
+                        storage.winnerMessageIds[guildConfig.id] = message.id
+
+                        this.storageController.write(storage)
+                            .then(() => resolve())
+                            .catch(reject)
+
+                    }
                 })
                 .catch(reject)
 

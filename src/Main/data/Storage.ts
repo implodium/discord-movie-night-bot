@@ -1,3 +1,6 @@
+import ScheduledMovieNight from "../util/ScheduledMovieNight";
+
 export default interface Storage {
-    winnerMessageId?: string
+    winnerMessageIds?: Record<string, string>
+    scheduledMovieNights?: Record<string, ScheduledMovieNight[]>
 }
