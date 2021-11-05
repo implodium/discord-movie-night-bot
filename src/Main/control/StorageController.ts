@@ -15,26 +15,16 @@ export default class StorageController {
     ) { }
 
 
-    get(): Promise<Storage> {
-        return new Promise((resolve, reject) => {
-            this.getFileLocation()
-                .then(fileLocation => {
-                    fs.readFile(fileLocation, {encoding: "utf8"},  (err, data) => {
-                        if (err) {
-                            reject(err)
-                        } else {
-                            let json: Storage
-                            try {
-                                json = JSON.parse(data);
-                            } catch {
-                                json = {}
-                            }
-                            resolve(json)
-                        }
-                    })
-                })
-                .catch(reject)
-        })
+    async get(): Promise<Storage> {
+        const fileLocation = await this.getFileLocation()
+
+        try {
+            const storage = await fs.promises.readFile(fileLocation, {encoding: "utf-8"})
+            return JSON.parse(storage)
+        } catch (e) {
+            await this.write({})
+            return {}
+        }
     }
 
     async clearWinnerMessageId(guildId: string): Promise<Storage> {
@@ -49,20 +39,15 @@ export default class StorageController {
         }
     }
 
-    write(storage: Storage): Promise<void> {
-        return new Promise((resolve, reject) => {
-            this.getFileLocation()
-                .then(fileLocation => {
-                    fs.writeFile(fileLocation, JSON.stringify(storage), err => {
-                        if (err) {
-                            reject()
-                        } else {
-                            resolve()
-                        }
-                    })
-                })
-                .catch(reject)
-        })
+    async write(storage: Storage): Promise<void> {
+        const fileLocation = await this.getFileLocation()
+
+        try {
+            await fs.promises.writeFile(fileLocation, JSON.stringify(storage))
+        } catch (e) {
+            await StorageController.createPathTo(fileLocation)
+            await this.write(storage)
+        }
     }
 
     private getFileLocation(): Promise<string> {
@@ -75,5 +60,17 @@ export default class StorageController {
                 reject(new InternalError("storage file location is not configured"))
             }
         })
+    }
+
+    private static async createPathTo(path: string): Promise<void> {
+        const directoryPath = StorageController.getDirectoryOf(path)
+        await fs.promises.mkdir(directoryPath, {recursive: true})
+    }
+
+    private static getDirectoryOf(filePath: string): string {
+        const pathComponents = filePath.split('/')
+        const directoryLocation = pathComponents
+            .slice(0, pathComponents.length - 1)
+        return directoryLocation.join('/')
     }
 }
