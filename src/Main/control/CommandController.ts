@@ -11,6 +11,7 @@ import GuildConfiguration from "../config/GuildConfiguration";
 import InternalError from "../error/InternalError";
 import CancelMovieNIghtCommand from "../commands/CancelMovieNIghtCommand";
 import ListMovieNightCommand from "../commands/ListMovieNightCommand";
+import ClearCommand from "../commands/ClearCommand";
 
 @injectable()
 export default class CommandController {
@@ -23,6 +24,7 @@ export default class CommandController {
         @inject(ScheduleMovieNightCommand) private scheduleMovieNightCommand: ScheduleMovieNightCommand,
         @inject(CancelMovieNIghtCommand) private cancelMovieNightCommand: CancelMovieNIghtCommand,
         @inject(ListMovieNightCommand) private listMovieNightCommand: ListMovieNightCommand,
+        @inject(ClearCommand) private clearCommand: ClearCommand,
         @inject(Logger) private logger: Logger
     ) { }
 
@@ -30,7 +32,8 @@ export default class CommandController {
         return Promise.all([
             this.initCommand(this.scheduleMovieNightCommand, guildConfig),
             this.initCommand(this.cancelMovieNightCommand, guildConfig),
-            this.initCommand(this.listMovieNightCommand, guildConfig)
+            this.initCommand(this.listMovieNightCommand, guildConfig),
+            this.initCommand(this.clearCommand, guildConfig)
         ])
     }
 

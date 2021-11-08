@@ -28,14 +28,17 @@ export default class VotingDisplayController {
                     switch (displayType) {
                         case VoteDisplayType.CHANNEL_NAME:
                             this.displayChannelName(votingResult, guildConfig)
+                                .then(resolve)
                                 .catch(reject)
                             break
                         case VoteDisplayType.CHANNEL_NAME_POSTFIX:
                             this.displayChannelNamePostFix(votingResult, guildConfig)
+                                .then(resolve)
                                 .catch(reject)
                             break
                         case VoteDisplayType.CHANNEL_MESSAGE:
                             this.displayChannelMessage(votingResult, guildConfig)
+                                .then(resolve)
                                 .catch(reject)
                             break
                     }
@@ -123,7 +126,7 @@ export default class VotingDisplayController {
                                     } else {
                                         this.logger.info("sending message")
                                         this.sendDisplayMessage(winningTextChannel, votingResult, guildConfig)
-                                            .then(() => resolve)
+                                            .then(() => resolve())
                                             .catch(reject)
                                     }
                                 })
