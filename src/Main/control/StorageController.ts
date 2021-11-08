@@ -5,6 +5,7 @@ import * as fs from 'fs'
 import InternalError from "../error/InternalError";
 import Logger from "../logger/Logger";
 import UserError from "../error/UserError";
+import GuildConfiguration from "../config/GuildConfiguration";
 
 @injectable()
 export default class StorageController {
@@ -15,6 +16,15 @@ export default class StorageController {
     ) { }
 
 
+    async initGuild(guildConfig: GuildConfiguration) {
+        if (guildConfig.id) {
+            const storage = await this.get()
+            storage.guildStorages[guildConfig.id] = {}
+        } else {
+            throw new InternalError('id was not set in the guild configuration')
+        }
+    }
+
     async get(): Promise<Storage> {
         const fileLocation = await this.getFileLocation()
 
@@ -22,16 +32,20 @@ export default class StorageController {
             const storage = await fs.promises.readFile(fileLocation, {encoding: "utf-8"})
             return JSON.parse(storage)
         } catch (e) {
-            await this.write({})
-            return {}
+            const storage = {guildStorages: {}}
+            await this.write({
+                guildStorages: {}
+            })
+
+            return storage
         }
     }
 
-    async clearWinnerMessageId(guildId: string): Promise<Storage> {
+    async clearGuildStorage(guildId: string): Promise<Storage> {
         const [fileLocation, storage] = await Promise.all([this.getFileLocation(), this.get()])
 
-        if (fileLocation && storage && storage.winnerMessageIds) {
-            delete storage.winnerMessageIds[guildId]
+        if (fileLocation && storage && storage.guildStorages) {
+            delete storage.guildStorages[guildId]
             await this.write(storage)
             return storage
         } else {

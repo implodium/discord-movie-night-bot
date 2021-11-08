@@ -118,16 +118,21 @@ export default class VotingDisplayController {
                         if (winningTextChannel) {
                             this.storageController.get()
                                 .then(storage => {
-                                    if (storage.winnerMessageIds && guildConfig.id && storage.winnerMessageIds[guildConfig.id]) {
-                                        this.logger.info("updating message")
-                                        this.updateDisplayMessage(winningTextChannel, storage.winnerMessageIds[guildConfig.id], votingResult)
-                                            .then(() => resolve())
-                                            .catch(reject)
+                                    if (guildConfig.id) {
+                                        const guildStorage = storage.guildStorages[guildConfig.id]
+                                        if (guildStorage && guildStorage.winnerMessageId) {
+                                            this.logger.info("updating message")
+                                            this.updateDisplayMessage(winningTextChannel, guildStorage.winnerMessageId, votingResult)
+                                                .then(() => resolve())
+                                                .catch(reject)
+                                        } else {
+                                            this.logger.info("sending message")
+                                            this.sendDisplayMessage(winningTextChannel, votingResult, guildConfig)
+                                                .then(() => resolve())
+                                                .catch(reject)
+                                        }
                                     } else {
-                                        this.logger.info("sending message")
-                                        this.sendDisplayMessage(winningTextChannel, votingResult, guildConfig)
-                                            .then(() => resolve())
-                                            .catch(reject)
+                                        throw new InternalError('id was not set in config')
                                     }
                                 })
                         }
@@ -137,26 +142,27 @@ export default class VotingDisplayController {
         })
     }
 
-    private sendDisplayMessage(textChannel: TextChannel, votingResult: Map<string, number>, guildConfig: GuildConfiguration): Promise<void> {
-        return new Promise((resolve, reject) => {
-            textChannel.send({embeds: [this.getEmbed(votingResult)]})
-                .then(message => {
-                    const storage: Storage = {
-                        winnerMessageIds: {}
-                    }
+    private async sendDisplayMessage(textChannel: TextChannel, votingResult: Map<string, number>, guildConfig: GuildConfiguration): Promise<void> {
+        const message = await textChannel.send({embeds: [this.getEmbed(votingResult)]})
+        const storage = await this.storageController.get()
 
-                    if (storage.winnerMessageIds && guildConfig.id) {
-                        storage.winnerMessageIds[guildConfig.id] = message.id
+        if (guildConfig.id) {
+            if (storage.guildStorages[guildConfig.id]) {
+                await this.saveWinnerMessageId(message.id, storage, guildConfig.id)
+            } else {
+                storage.guildStorages[guildConfig.id] = {}
+                await this.saveWinnerMessageId(message.id, storage, guildConfig.id)
+            }
+        } else {
+            throw new InternalError('id is not set in configuration')
+        }
+    }
 
-                        this.storageController.write(storage)
-                            .then(() => resolve())
-                            .catch(reject)
-
-                    }
-                })
-                .catch(reject)
-
-        })
+    private async saveWinnerMessageId(winnerMessageId: string, storage: Storage, guildId: string) {
+        if (storage.guildStorages[guildId]) {
+            storage.guildStorages[guildId].winnerMessageId = winnerMessageId
+            await this.storageController.write(storage)
+        } else throw new InternalError('guild storage is undefined')
     }
 
     private updateDisplayMessage(textChannel: TextChannel, messageId: string, votingResult: Map<string, number>): Promise<void> {

@@ -1,6 +1,5 @@
-import ScheduledMovieNight from "../util/ScheduledMovieNight";
+import GuildStorage from "./GuildStorage";
 
 export default interface Storage {
-    winnerMessageIds?: Record<string, string>
-    scheduledMovieNights?: Record<string, ScheduledMovieNight[]>
+    guildStorages: Record<string, GuildStorage>
 }

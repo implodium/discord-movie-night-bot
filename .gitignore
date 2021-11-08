@@ -195,4 +195,4 @@ config/env/.env.dev
 
 ### Data
 
-data
+data/storage.json

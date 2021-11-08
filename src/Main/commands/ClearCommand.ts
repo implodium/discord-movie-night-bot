@@ -27,7 +27,7 @@ export default class ClearCommand extends Command {
             if (interaction.guildId) {
                 await interaction.reply("clearing storage")
                 const config = this.configController.getConfigurationByGuildId(interaction.guildId)
-                await this.storageController.clearWinnerMessageId(interaction.guildId)
+                await this.storageController.clearGuildStorage(interaction.guildId)
                 await interaction.editReply("updating bot")
                 await this.votingController.initGuild(config)
                 await interaction.editReply("storage cleared")
