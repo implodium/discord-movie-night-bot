@@ -7,6 +7,7 @@ import ScheduleController from "./ScheduleController";
 import {Subject} from "rxjs";
 import ScheduledMovieNight from "../util/ScheduledMovieNight";
 import InternalError from "../error/InternalError";
+import StorageController from "./StorageController";
 
 @injectable()
 export default class MovieNightController {
@@ -16,7 +17,8 @@ export default class MovieNightController {
     constructor(
         @inject(Logger) private logger: Logger,
         @inject(ConfigController) private configController: ConfigController,
-        @inject(ScheduleController) private scheduleController: ScheduleController
+        @inject(ScheduleController) private scheduleController: ScheduleController,
+        @inject(StorageController) private storageController: StorageController
     ) {
     }
 
@@ -77,6 +79,7 @@ export default class MovieNightController {
         if (guildConfig.id) {
             const scheduledGuildMovies = this.schedulesMovieNights.get(guildConfig.id)
             if (scheduledGuildMovies) {
+                this.storageController.pushMovieNight({date}, guildConfig.id)
                 scheduledGuildMovies.push({
                     date,
                     movieNightJob,
