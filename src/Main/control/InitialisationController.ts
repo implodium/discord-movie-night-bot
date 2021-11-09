@@ -11,6 +11,7 @@ import Logger from "../logger/Logger";
 import ConfigController from "./ConfigController";
 import GuildConfigurations from "../config/GuildConfigurations";
 import GuildConfiguration from "../config/GuildConfiguration";
+import StorageController from "./StorageController";
 
 @injectable()
 export default class InitialisationController {
@@ -24,6 +25,7 @@ export default class InitialisationController {
         @inject(AutoScheduleController) private autoScheduleController: AutoScheduleController,
         @inject(VotingController) private votingController: VotingController,
         @inject(DiscordController) private discordController: DiscordController,
+        @inject(StorageController) private storageController: StorageController
     ) {
     }
 
@@ -71,6 +73,7 @@ export default class InitialisationController {
             this.autoScheduleController.initGuild(guildConfig),
             this.autoScheduleController.initGuild(guildConfig),
             this.commandController.initGuild(guildConfig),
+            this.storageController.initGuild(guildConfig)
         ]
     }
 
