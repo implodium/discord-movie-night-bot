@@ -57,7 +57,7 @@ export default class StorageController {
         const fileLocation = await this.getFileLocation()
 
         try {
-            await fs.promises.writeFile(fileLocation, JSON.stringify(storage))
+            await fs.promises.writeFile(fileLocation, JSON.stringify(storage, null, 2))
         } catch (e) {
             await StorageController.createPathTo(fileLocation)
             await this.write(storage)
