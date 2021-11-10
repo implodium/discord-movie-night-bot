@@ -120,7 +120,7 @@ export default class MovieNightController {
     }
 
     cancelNextMovieNight(guildId: string, deletes: number = 1) {
-        const movieNights = this.sortMovieNights(guildId)
+        const movieNights = this.getSortMovieNights(guildId)
         let index = 0
 
         while (index <= deletes) {
@@ -135,7 +135,7 @@ export default class MovieNightController {
         scheduledMovieNight.movieNightFinalDecisionJob.cancel()
     }
 
-    sortMovieNights(guildId: string) {
+    getSortMovieNights(guildId: string) {
         const guildMovieNights = this.getGuildMovieNights(guildId)
 
         guildMovieNights.sort((s1, s2) => {

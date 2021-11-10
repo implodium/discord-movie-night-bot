@@ -22,7 +22,7 @@ export default class ClearCommand extends Command {
         this.mode = PermissionMode.ADMIN_ONLY
     }
 
-    async exec(interaction: CommandInteraction): Promise<void> {
+    async run(interaction: CommandInteraction): Promise<void> {
         try {
             if (interaction.guildId) {
                 await interaction.reply("clearing storage")

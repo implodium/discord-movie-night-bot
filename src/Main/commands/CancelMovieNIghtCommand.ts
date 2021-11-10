@@ -19,7 +19,7 @@ export default class CancelMovieNIghtCommand extends Command {
         this.mode = PermissionMode.ADMIN_ONLY
     }
 
-    async exec(interaction: CommandInteraction): Promise<void> {
+    async run(interaction: CommandInteraction): Promise<void> {
         if (interaction.guildId) {
             try {
                 this.movieNightController.cancelNextMovieNight(

@@ -1,7 +1,8 @@
 import Option from "./Option";
-import {CommandInteraction} from "discord.js";
+import {CommandInteraction, Guild} from "discord.js";
 import {PermissionMode} from "../util/PermissionMode";
 import {injectable} from "inversify";
+import InternalError from "../error/InternalError";
 
 @injectable()
 export default abstract class Command {
@@ -12,7 +13,15 @@ export default abstract class Command {
     mode: PermissionMode = PermissionMode.BLACKLIST
     listedRoles: string[] = []
 
-    public abstract exec(interaction: CommandInteraction): Promise<void>
+    public async exec(interaction: CommandInteraction): Promise<void> {
+        if (interaction.guild) {
+            await this.run(interaction, interaction.guild)
+        } else {
+            throw new InternalError('command should only be used in a guild')
+        }
+    }
+
+    public abstract run(interaction: CommandInteraction, guild: Guild): Promise<void>
 
     addIntOption(... option: Option<number>[]): Command {
         this.intOptions.push(... option)

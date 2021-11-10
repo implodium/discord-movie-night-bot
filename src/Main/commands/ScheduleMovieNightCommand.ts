@@ -47,7 +47,7 @@ export default class ScheduleMovieNightCommand extends Command {
         )
     }
 
-    async exec(interaction: CommandInteraction): Promise<void> {
+    async run(interaction: CommandInteraction): Promise<void> {
         const date = ScheduleMovieNightCommand.getDateFrom(interaction.options)
         const guildConfigs: GuildConfigurations = this.configController.getConfig('guilds')
 
