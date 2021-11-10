@@ -22,13 +22,29 @@ export default class MovieNightController {
     ) {
     }
 
-    initGuild(guildConfig: GuildConfiguration) {
+    async initGuild(guildConfig: GuildConfiguration) {
         if (guildConfig.id) {
             this.schedulesMovieNights.set(guildConfig.id, [])
+            const storage = await this.storageController.get()
+            const guildStorages = await storage.guildStorages
+
+            if (guildStorages) {
+                const guildStorage = guildStorages[guildConfig.id]
+                if (guildStorage && guildStorage.scheduledMovieNights) {
+                    for (const movieNight of guildStorage.scheduledMovieNights) {
+                        this.logger.debug(typeof movieNight.date)
+                        await this.scheduleMovieNight(new Date(movieNight.date), guildConfig)
+                    }
+                }
+            } else {
+                throw new InternalError('guild storage not set')
+            }
+        } else {
+            throw new InternalError("id was not set in configuration")
         }
     }
 
-    async startMovieNight(date: Date, guildConfig: GuildConfiguration) {
+    async scheduleMovieNight(date: Date, guildConfig: GuildConfiguration) {
         const movieNightEvent = new Subject<void>()
         this.logger.info('scheduling new movie night on ' + date.toLocaleString())
         const announcementConfig: AnnouncementConfiguration = await this
@@ -79,7 +95,6 @@ export default class MovieNightController {
         if (guildConfig.id) {
             const scheduledGuildMovies = this.schedulesMovieNights.get(guildConfig.id)
             if (scheduledGuildMovies) {
-                await this.storageController.pushMovieNight({date}, guildConfig.id)
                 scheduledGuildMovies.push({
                     date,
                     movieNightJob,
@@ -89,6 +104,19 @@ export default class MovieNightController {
                 })
             }
         }
+    }
+
+    async storeMovieNight(date: Date, guildConfig: GuildConfiguration) {
+        if (guildConfig.id) {
+            await this.storageController.pushMovieNight({date}, guildConfig.id)
+        }
+    }
+
+    async startMovieNight(date: Date, guildConfig: GuildConfiguration) {
+        await Promise.all([
+            await this.scheduleMovieNight(date, guildConfig),
+            await this.storeMovieNight(date, guildConfig)
+        ])
     }
 
     cancelNextMovieNight(guildId: string, deletes: number = 1) {
