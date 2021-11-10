@@ -16,8 +16,6 @@
           "name": "someEvent",
           "start": "10.11",
           "end": "10.11",
-          "normalMultiplier": 0.5,
-          "eventMultiplier": 0.5,
           "emoji": "\uD83D\uDCA9"
         },
         {
