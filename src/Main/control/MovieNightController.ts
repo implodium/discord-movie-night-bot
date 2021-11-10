@@ -79,7 +79,7 @@ export default class MovieNightController {
         if (guildConfig.id) {
             const scheduledGuildMovies = this.schedulesMovieNights.get(guildConfig.id)
             if (scheduledGuildMovies) {
-                this.storageController.pushMovieNight({date}, guildConfig.id)
+                await this.storageController.pushMovieNight({date}, guildConfig.id)
                 scheduledGuildMovies.push({
                     date,
                     movieNightJob,
