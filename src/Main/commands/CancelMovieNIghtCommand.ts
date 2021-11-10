@@ -1,6 +1,6 @@
 import {inject, injectable} from "inversify";
 import Command from "./Command";
-import {CommandInteraction} from "discord.js";
+import {CommandInteraction, Guild} from "discord.js";
 import MovieNightController from "../control/MovieNightController";
 import Logger from "../logger/Logger";
 import {PermissionMode} from "../util/PermissionMode";
@@ -19,19 +19,27 @@ export default class CancelMovieNIghtCommand extends Command {
         this.mode = PermissionMode.ADMIN_ONLY
     }
 
-    async run(interaction: CommandInteraction): Promise<void> {
-        if (interaction.guildId) {
-            try {
-                this.movieNightController.cancelNextMovieNight(
-                    interaction.guildId,
-                    1
-                )
-
-                await interaction.reply('canceled next movie night')
-            } catch (e) {
-                this.logger.error(e)
-                await interaction.reply('no movie night left to cancel')
-            }
+    async run(interaction: CommandInteraction, guild: Guild): Promise<void> {
+        try {
+            await this.cancelMovieNightAndReply(interaction, guild)
+        } catch (e) {
+            await CancelMovieNIghtCommand.replyNoMoviesLeft(interaction)
         }
+    }
+
+    private deleteNextMovieNightOf(guild: Guild) {
+        this.movieNightController.cancelNextMovieNight(
+            guild.id,
+            1
+        )
+    }
+
+    private async cancelMovieNightAndReply(interaction: CommandInteraction, guild: Guild) {
+        this.deleteNextMovieNightOf(guild)
+        await interaction.reply('canceled next movie night')
+    }
+
+    private static async replyNoMoviesLeft(interaction: CommandInteraction) {
+        await interaction.reply('no movie night left to cancel')
     }
 }
