@@ -6,6 +6,7 @@ import InternalError from "../error/InternalError";
 import Logger from "../logger/Logger";
 import UserError from "../error/UserError";
 import GuildConfiguration from "../config/GuildConfiguration";
+import StorableMovieNight from "../util/StorableMovieNight";
 
 @injectable()
 export default class StorageController {
@@ -86,5 +87,25 @@ export default class StorageController {
         const directoryLocation = pathComponents
             .slice(0, pathComponents.length - 1)
         return directoryLocation.join('/')
+    }
+
+    async pushMovieNight(movieNight: StorableMovieNight, id: string) {
+        const storage = await this.get()
+        const guildStorage = storage.guildStorages[id];
+
+        if (guildStorage) {
+            this.logger.debug("storage is available")
+            if (!guildStorage.scheduledMovieNights) {
+                guildStorage.scheduledMovieNights = []
+
+
+            }
+
+            guildStorage.scheduledMovieNights.push(movieNight)
+            await this.write(storage)
+
+        } else {
+            throw new InternalError('Guild Storage not defined')
+        }
     }
 }

@@ -1,6 +1,6 @@
-import ScheduledMovieNight from "../util/ScheduledMovieNight";
+import StorableMovieNight from "../util/StorableMovieNight";
 
 export default interface GuildStorage {
     winnerMessageId?: string
-    scheduledMovieNights?: Record<string, ScheduledMovieNight>
+    scheduledMovieNights?: StorableMovieNight[]
 }
