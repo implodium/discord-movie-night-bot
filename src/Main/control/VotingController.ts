@@ -41,7 +41,7 @@ export default class VotingController {
                     .then(channel => {
                         if (channel.type === "GUILD_TEXT") {
                             const textChannel = channel as TextChannel
-                            this.countVotes(textChannel)
+                            this.countVotes(textChannel, guildConfig)
                                 .then(countResults => this.getMostVoted(countResults))
                                 .then(votingResults => this.displayController.displayVotingResult(votingResults, guildConfig))
                                 // .then(countResults => this.displayMostVoted(countResults, textChannel))
@@ -77,12 +77,12 @@ export default class VotingController {
         })
     }
 
-    async countVotes(channel: TextChannel): Promise<Map<string, number>> {
+    async countVotes(channel: TextChannel, guildConfig: GuildConfiguration): Promise<Map<string, number>> {
         const reactionResults = new Map<string, number>()
         const messages = await this.discordController.getMessagesFrom(channel)
 
         for (const message of Array.from(messages.values())) {
-            const multiplier = this.movieNightEventController.getMultiplier(message)
+            const multiplier = this.movieNightEventController.getMultiplier(message, guildConfig)
             const [thumbsUpReactions, thumbsDownReactions] =  await Promise.all([
                 this.discordController.count('👍', message),
                 this.discordController.count('👎', message)
