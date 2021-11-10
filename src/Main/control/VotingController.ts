@@ -8,6 +8,7 @@ import VotingDisplayController from "./VotingDisplayController";
 import {BehaviorSubject, Observable} from "rxjs";
 import {filter} from "rxjs/operators";
 import GuildConfiguration from "../config/GuildConfiguration";
+import MovieNightEventController from "./MovieNightEventController";
 
 @injectable()
 export default class VotingController {
@@ -19,6 +20,7 @@ export default class VotingController {
         @inject(DiscordController) private discordController: DiscordController,
         @inject(ConfigController) private configController: ConfigController,
         @inject(VotingDisplayController) private displayController: VotingDisplayController,
+        @inject(MovieNightEventController) private movieNightEventController: MovieNightEventController,
         @inject(Logger) private logger: Logger
     ) {
         this.discordClient = discordController.client
@@ -76,34 +78,25 @@ export default class VotingController {
     }
 
     async countVotes(channel: TextChannel): Promise<Map<string, number>> {
-        return new Promise((resolve, reject) => {
-            const reactionResults = new Map<string, number>()
+        const reactionResults = new Map<string, number>()
+        const messages = await this.discordController.getMessagesFrom(channel)
 
-            this.discordController.getMessagesFrom(channel)
-                .then(messages => {
-                    const messagesCount = messages.size
+        for (const message of Array.from(messages.values())) {
+            const multiplier = this.movieNightEventController.getMultiplier(message)
+            const [thumbsUpReactions, thumbsDownReactions] =  await Promise.all([
+                this.discordController.count('👍', message),
+                this.discordController.count('👎', message)
+            ])
 
-                    messages.forEach(message => {
-                        const thumbsUpReactionsPromise = this.discordController.count('👍', message)
-                        const thumbsDownReactionsPromise = this.discordController.count('👎', message)
+            const result = thumbsUpReactions * multiplier - thumbsDownReactions
+            reactionResults.set(message.content, result)
+        }
 
-                        Promise.all([thumbsUpReactionsPromise, thumbsDownReactionsPromise])
-                            .then( reactions => {
-                                const thumbsUp = reactions[0]
-                                const thumbsDown = reactions[1]
-
-                                const result = thumbsUp - thumbsDown
-                                reactionResults.set(message.content, result)
-
-                                if (reactionResults.size === messagesCount) {
-                                    resolve(reactionResults)
-                                }
-                            })
-                            .catch(reject)
-                    })
-                })
-                .catch(reject)
-        })
+        if (reactionResults.size === messages.size) {
+            return reactionResults
+        } else throw new InternalError(
+            'counting votes failed something went wrong'
+        )
     }
 
     private getMostVoted(countResults: Map<string, number>): Promise<Map<string, number>> {
