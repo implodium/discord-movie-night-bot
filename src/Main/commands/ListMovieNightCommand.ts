@@ -1,14 +1,15 @@
 import {inject, injectable} from "inversify";
 import Command from "./Command";
-import {CommandInteraction, Guild, MessageEmbed} from "discord.js";
+import {CommandInteraction, Guild} from "discord.js";
 import MovieNightController from "../control/MovieNightController";
-import InternalError from "../error/InternalError";
 import DateUtil from "../util/DateUtil";
 import {PermissionMode} from "../util/PermissionMode";
-import ListMovieNightResponseBuilder from "../util/ListMovieNightResponseBuilder";
+import ListMovieNightExecution from "./execution/ListMovieNightExecution";
 
 @injectable()
 export default class ListMovieNightCommand extends Command{
+
+    executions: ListMovieNightExecution[] = []
 
     constructor(
         @inject(MovieNightController) private movieNightController: MovieNightController,
@@ -21,9 +22,14 @@ export default class ListMovieNightCommand extends Command{
     }
 
     async run(interaction: CommandInteraction, guild: Guild): Promise<void> {
-        const sortedMovieNights = this.movieNightController.getSortMovieNights(guild.id)
-        const messageBuilder = new ListMovieNightResponseBuilder(sortedMovieNights, this.dateUtil)
-        const messageEmbed = messageBuilder.build()
-        await interaction.reply({embeds: [messageEmbed]})
+        const execution = new ListMovieNightExecution(
+            interaction,
+            guild,
+            this.movieNightController,
+            this.dateUtil
+        )
+
+        await execution.run()
+        this.executions.push(execution)
     }
 }
