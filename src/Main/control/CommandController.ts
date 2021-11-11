@@ -79,7 +79,12 @@ export default class CommandController {
                 && interaction.commandName === command.name
             ) {
                 if (await this.isPermittedFor(command, guildConfig, interaction)) {
-                    await command.exec(interaction)
+                    try {
+                        await command.exec(interaction)
+                    } catch (e) {
+                        this.logger.error(e)
+                        this.logger.error(e.stack)
+                    }
                 } else {
                     await interaction.reply('You dont have the permission for this command')
                 }
