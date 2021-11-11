@@ -28,5 +28,6 @@ export default class CancelMovieNIghtCommand extends Command {
         )
 
         await execution.run()
+        this.executions.push(execution)
     }
 }

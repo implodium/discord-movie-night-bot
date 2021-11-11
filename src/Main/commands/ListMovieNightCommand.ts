@@ -9,8 +9,6 @@ import ListMovieNightExecution from "./execution/ListMovieNightExecution";
 @injectable()
 export default class ListMovieNightCommand extends Command{
 
-    executions: ListMovieNightExecution[] = []
-
     constructor(
         @inject(MovieNightController) private movieNightController: MovieNightController,
         @inject(DateUtil) private dateUtil: DateUtil

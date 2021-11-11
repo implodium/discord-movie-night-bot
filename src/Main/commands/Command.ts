@@ -3,6 +3,7 @@ import {CommandInteraction, Guild} from "discord.js";
 import {PermissionMode} from "../util/PermissionMode";
 import {injectable} from "inversify";
 import InternalError from "../error/InternalError";
+import Execution from "./execution/Execution";
 
 @injectable()
 export default abstract class Command {
@@ -12,6 +13,7 @@ export default abstract class Command {
     intOptions: Option<number>[] = []
     mode: PermissionMode = PermissionMode.BLACKLIST
     listedRoles: string[] = []
+    executions: Execution[] = []
 
     public async exec(interaction: CommandInteraction): Promise<void> {
         if (interaction.guild) {
