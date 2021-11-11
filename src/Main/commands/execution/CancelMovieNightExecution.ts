@@ -23,15 +23,13 @@ export default class CancelMovieNightExecution extends Execution {
         }
     }
 
-    private async  deleteNextMovieNightOf() {
-        await this.movieNightController.cancelNextMovieNight(
-            this.guild.id,
-            1
-        )
+    private async  cancelNextMovieNightOf() {
+        await this.movieNightController
+            .cancelNextMovieNight(this.guild.id)
     }
 
     private async cancelMovieNightAndReply() {
-        this.deleteNextMovieNightOf()
+        await this.cancelNextMovieNightOf()
         await this.interaction.reply(this.successMessage)
     }
 
