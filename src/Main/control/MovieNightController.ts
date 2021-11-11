@@ -8,6 +8,7 @@ import {Subject} from "rxjs";
 import ScheduledMovieNight from "../util/ScheduledMovieNight";
 import InternalError from "../error/InternalError";
 import StorageController from "./StorageController";
+import StorableMovieNight from "../util/StorableMovieNight";
 
 @injectable()
 export default class MovieNightController {
@@ -106,27 +107,45 @@ export default class MovieNightController {
         }
     }
 
-    async storeMovieNight(date: Date, guildConfig: GuildConfiguration) {
+    async storeMovieNightWithConfig(date: Date, guildConfig: GuildConfiguration) {
         if (guildConfig.id) {
-            await this.storageController.pushMovieNight({date}, guildConfig.id)
+            await this.storeMovieNightWithId(date, guildConfig.id)
         }
+    }
+
+    async storeMovieNightWithId(date: Date, guildId: string) {
+        await this.storageController.pushMovieNight({date}, guildId)
+    }
+
+    async storeMovieNights(scheduledMovieNights: ScheduledMovieNight[], guildId: string) {
+        const storableMovieNights = scheduledMovieNights
+            .map(this.convertScheduledToStorable)
+
+        await this.storageController
+            .updateStoredMovieNights(storableMovieNights, guildId)
+    }
+
+    convertScheduledToStorable(scheduledMovieNight: ScheduledMovieNight): StorableMovieNight {
+        return {date: scheduledMovieNight.date}
     }
 
     async startMovieNight(date: Date, guildConfig: GuildConfiguration) {
         await Promise.all([
             await this.scheduleMovieNight(date, guildConfig),
-            await this.storeMovieNight(date, guildConfig)
+            await this.storeMovieNightWithConfig(date, guildConfig)
         ])
     }
 
-    cancelNextMovieNight(guildId: string, deletes: number = 1) {
+    async cancelNextMovieNight(guildId: string, deletes: number = 1) {
         const movieNights = this.getSortMovieNights(guildId)
         let index = 0
 
-        while (index <= deletes) {
+        while (index < deletes) {
             movieNights.pop()
             index++
         }
+
+        await this.storeMovieNights(movieNights, guildId)
     }
 
     cancelMovieNightSchedules(scheduledMovieNight: ScheduledMovieNight) {

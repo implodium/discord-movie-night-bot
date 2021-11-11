@@ -108,4 +108,14 @@ export default class StorageController {
             throw new InternalError('Guild Storage not defined')
         }
     }
+
+    async updateStoredMovieNights(movieNights: StorableMovieNight[], id: string) {
+        const storage = await this.get()
+        const guildStorage = storage.guildStorages[id]
+
+        if (guildStorage) {
+            guildStorage.scheduledMovieNights = movieNights
+            await this.write(storage)
+        }
+    }
 }

@@ -23,8 +23,8 @@ export default class CancelMovieNightExecution extends Execution {
         }
     }
 
-    private deleteNextMovieNightOf() {
-        this.movieNightController.cancelNextMovieNight(
+    private async  deleteNextMovieNightOf() {
+        await this.movieNightController.cancelNextMovieNight(
             this.guild.id,
             1
         )
