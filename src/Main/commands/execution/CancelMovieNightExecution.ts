@@ -10,7 +10,7 @@ export default class CancelMovieNightExecution extends Execution {
     constructor(
         private interaction: CommandInteraction,
         private guild: Guild,
-        private movieNightController: MovieNightController
+        private movieNightController: MovieNightController,
     ) {
         super();
     }

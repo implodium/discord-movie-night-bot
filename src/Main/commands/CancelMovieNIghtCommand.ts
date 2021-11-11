@@ -2,7 +2,6 @@ import {inject, injectable} from "inversify";
 import Command from "./Command";
 import {CommandInteraction, Guild} from "discord.js";
 import MovieNightController from "../control/MovieNightController";
-import Logger from "../logger/Logger";
 import {PermissionMode} from "../util/PermissionMode";
 import CancelMovieNightExecution from "./execution/CancelMovieNightExecution";
 
@@ -10,8 +9,7 @@ import CancelMovieNightExecution from "./execution/CancelMovieNightExecution";
 export default class CancelMovieNIghtCommand extends Command {
 
     constructor(
-        @inject(MovieNightController) private movieNightController: MovieNightController,
-        @inject(Logger) private logger: Logger
+        @inject(MovieNightController) private movieNightController: MovieNightController
     ) {
         super()
         this.name = 'cancel-movie-night'
@@ -24,7 +22,7 @@ export default class CancelMovieNIghtCommand extends Command {
         const execution = new CancelMovieNightExecution(
             interaction,
             guild,
-            this.movieNightController
+            this.movieNightController,
         )
 
         await execution.run()
