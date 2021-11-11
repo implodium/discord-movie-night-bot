@@ -6,7 +6,7 @@ import {PermissionMode} from "../util/PermissionMode";
 import CancelMovieNightExecution from "./execution/CancelMovieNightExecution";
 
 @injectable()
-export default class CancelMovieNIghtCommand extends Command {
+export default class CancelMovieNightCommand extends Command {
 
     constructor(
         @inject(MovieNightController) private movieNightController: MovieNightController

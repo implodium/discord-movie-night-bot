@@ -9,7 +9,7 @@ import Logger from "../logger/Logger";
 import {PermissionMode} from "../util/PermissionMode";
 import GuildConfiguration from "../config/GuildConfiguration";
 import InternalError from "../error/InternalError";
-import CancelMovieNIghtCommand from "../commands/CancelMovieNIghtCommand";
+import CancelMovieNightCommand from "../commands/CancelMovieNightCommand";
 import ListMovieNightCommand from "../commands/ListMovieNightCommand";
 import ClearCommand from "../commands/ClearCommand";
 
@@ -22,7 +22,7 @@ export default class CommandController {
         @inject(DiscordController) private discordController: DiscordController,
         @inject(ConfigController) private configController: ConfigController,
         @inject(ScheduleMovieNightCommand) private scheduleMovieNightCommand: ScheduleMovieNightCommand,
-        @inject(CancelMovieNIghtCommand) private cancelMovieNightCommand: CancelMovieNIghtCommand,
+        @inject(CancelMovieNightCommand) private cancelMovieNightCommand: CancelMovieNightCommand,
         @inject(ListMovieNightCommand) private listMovieNightCommand: ListMovieNightCommand,
         @inject(ClearCommand) private clearCommand: ClearCommand,
         @inject(Logger) private logger: Logger
