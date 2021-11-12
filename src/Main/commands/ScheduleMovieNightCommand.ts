@@ -58,12 +58,4 @@ export default class ScheduleMovieNightCommand extends Command {
         await execution.run()
         this.executions.push(execution)
     }
-
-    addRequiredIntOption(name: string, description: string): void {
-        this.addIntOption(new Option<number>(
-            name,
-            description,
-            true
-        ))
-    }
 }

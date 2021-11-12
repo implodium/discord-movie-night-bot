@@ -8,12 +8,12 @@ import Execution from "./execution/Execution";
 @injectable()
 export default abstract class Command {
 
-    name?: string
-    description?: string
-    intOptions: Option<number>[] = []
-    mode: PermissionMode = PermissionMode.BLACKLIST
-    listedRoles: string[] = []
-    executions: Execution[] = []
+    public name?: string
+    public description?: string
+    public intOptions: Option<number>[] = []
+    public mode: PermissionMode = PermissionMode.BLACKLIST
+    public listedRoles: string[] = []
+    protected executions: Execution[] = []
 
     public async exec(interaction: CommandInteraction): Promise<void> {
         if (interaction.guild) {
@@ -28,6 +28,14 @@ export default abstract class Command {
     addIntOption(... option: Option<number>[]): Command {
         this.intOptions.push(... option)
         return this
+    }
+
+    addRequiredIntOption(name: string, description: string): void {
+        this.addIntOption(new Option<number>(
+            name,
+            description,
+            true
+        ))
     }
 
     addRoles(... roleIds: string[]): Command {
