@@ -1,12 +1,12 @@
 import Command from "./Command";
 import Option from './Option'
-import {CommandInteraction, CommandInteractionOptionResolver} from "discord.js";
+import {CommandInteraction, Guild} from "discord.js";
 import {inject, injectable} from "inversify";
 import {PermissionMode} from "../util/PermissionMode";
 import MovieNightController from "../control/MovieNightController";
 import ConfigController from "../control/ConfigController";
-import GuildConfigurations from "../config/GuildConfigurations";
 import Logger from "../logger/Logger";
+import ScheduleMovieNightExecution from "./execution/ScheduleMovieNightExecution";
 
 @injectable()
 export default class ScheduleMovieNightCommand extends Command {
@@ -47,20 +47,16 @@ export default class ScheduleMovieNightCommand extends Command {
         )
     }
 
-    async run(interaction: CommandInteraction): Promise<void> {
-        const date = ScheduleMovieNightCommand.getDateFrom(interaction.options)
-        const guildConfigs: GuildConfigurations = this.configController.getConfig('guilds')
+    async run(interaction: CommandInteraction, guild: Guild): Promise<void> {
+        const execution = new ScheduleMovieNightExecution(
+            interaction,
+            guild,
+            this.configController,
+            this.movieNightController
+        )
 
-        this.logger.debug(date)
-
-        if (interaction.guild && guildConfigs[interaction.guild.id]) {
-            await this.movieNightController.startMovieNight(
-                date,
-                guildConfigs[interaction.guild.id]
-            )
-
-            await interaction.reply("movie night scheduled")
-        }
+        await execution.run()
+        this.executions.push(execution)
     }
 
     addRequiredIntOption(name: string, description: string): void {
@@ -69,16 +65,5 @@ export default class ScheduleMovieNightCommand extends Command {
             description,
             true
         ))
-    }
-
-    private static getDateFrom(options: CommandInteractionOptionResolver) {
-        // (!) because values are required
-        return new Date(
-            options.getInteger('year')!,
-            options.getInteger('month')! - 1,
-            options.getInteger('day')!,
-            options.getInteger('hour')!,
-            options.getInteger('minute')!
-        )
     }
 }
