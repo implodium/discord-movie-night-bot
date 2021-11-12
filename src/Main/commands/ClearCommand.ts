@@ -1,10 +1,11 @@
 import {inject, injectable} from "inversify";
 import Command from "./Command";
-import {CommandInteraction} from "discord.js";
+import {CommandInteraction, Guild} from "discord.js";
 import {PermissionMode} from "../util/PermissionMode";
 import StorageController from "../control/StorageController";
 import VotingController from "../control/VotingController";
 import ConfigController from "../control/ConfigController";
+import ClearCommandExecution from "./execution/ClearCommandExecution";
 
 @injectable()
 export default class ClearCommand extends Command {
@@ -12,7 +13,7 @@ export default class ClearCommand extends Command {
     constructor(
         @inject(StorageController) private storageController: StorageController,
         @inject(VotingController) private votingController: VotingController,
-        @inject(ConfigController) private configController: ConfigController
+        @inject(ConfigController) private configController: ConfigController,
     ) {
         super()
         this.name = "clear"
@@ -20,14 +21,16 @@ export default class ClearCommand extends Command {
         this.mode = PermissionMode.ADMIN_ONLY
     }
 
-    async run(interaction: CommandInteraction): Promise<void> {
-        if (interaction.guildId) {
-            await interaction.reply("clearing storage")
-            const config = this.configController.getConfigurationByGuildId(interaction.guildId)
-            await this.storageController.clearGuildStorage(interaction.guildId)
-            await interaction.editReply("updating bot")
-            await this.votingController.initGuild(config)
-            await interaction.editReply("storage cleared")
-        }
+    async run(interaction: CommandInteraction, guild: Guild): Promise<void> {
+        const execution = new ClearCommandExecution(
+            interaction,
+            guild,
+            this.configController,
+            this.storageController,
+            this.votingController
+        );
+
+        await execution.run()
+        this.executions.push(execution)
     }
 }
