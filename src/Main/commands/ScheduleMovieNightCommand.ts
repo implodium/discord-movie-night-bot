@@ -1,5 +1,4 @@
 import Command from "./Command";
-import Option from './Option'
 import {CommandInteraction, Guild} from "discord.js";
 import {inject, injectable} from "inversify";
 import {PermissionMode} from "../util/PermissionMode";
