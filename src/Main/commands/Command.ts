@@ -30,12 +30,14 @@ export default abstract class Command {
         return this
     }
 
-    addRequiredIntOption(name: string, description: string): void {
+    addRequiredIntOption(name: string, description: string): Command {
         this.addIntOption(new Option<number>(
             name,
             description,
             true
         ))
+
+        return this
     }
 
     addRoles(... roleIds: string[]): Command {
