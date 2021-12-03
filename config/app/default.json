@@ -9,16 +9,37 @@
       "winningMessageId": "888660493777137664",
       "cinemaChannelId": "888834356095901757",
       "announcementChannelId": "888384291690643528",
-      "votingDisplayTypes": ["CHANNEL_MESSAGE"]
+      "adminRoleId": "617895674645577750",
+      "votingDisplayTypes": ["CHANNEL_MESSAGE"],
+      "events": [
+        {
+          "name": "someEvent",
+          "start": "10.11",
+          "end": "10.11",
+          "emoji": "\uD83D\uDCA9"
+        },
+        {
+          "name": "christmas",
+          "start": "1.12",
+          "end": "24.12",
+          "emoji": "❄️"
+        },
+        {
+          "name": "easter",
+          "start": "1.4",
+          "end": "1.5",
+          "emoji": "\uD83D\uDC30"
+        }
+      ]
     }
   },
   "announcements": {
-    "automatic": true,
+    "automatic": false,
     "announcementTime": 3,
     "everyCount": 1,
-    "time": "12:57",
+    "time": "11:20",
     "every": "week",
-    "day": 1,
+    "day": 5,
     "announcementMessages": {
       "movieNight": {
         "titleDefault": "Movie night: $date",

@@ -5,9 +5,9 @@ desired bot. This application is primary for managing a movie night. The feature
 
 - [x] Voting for a movie via discord reactions
 - [x] Announcements in specific intervals for a new movie night
-- [ ] Manual Announcements for a new movie night
+- [x] Manual Announcements for a new movie night
 - [x] displaying the most voted movie
-- [ ] Specific configurable events with different voting system.
+- [x] Specific configurable events with different voting system.
 
 ## Running the Application
 

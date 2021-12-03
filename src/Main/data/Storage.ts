@@ -1,3 +1,5 @@
+import GuildStorage from "./GuildStorage";
+
 export default interface Storage {
-    winnerMessageId?: string
+    guildStorages: Record<string, GuildStorage>
 }
