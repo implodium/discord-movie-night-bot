@@ -1,3 +1,53 @@
 {
-
+  "storageFileLocation": "data/storage.json",
+  "guilds": {
+    "388433193638035457": {
+      "id": "388433193638035457",
+      "votingChannelId": "716060319839027200",
+      "errChannel": "410537317497831424",
+      "winningChannelId": "716646179898916894",
+      "cinemaChannelId": "718538486520610917",
+      "announcementChannelId": "716646179898916894",
+      "adminRoleId": "388474955169529856",
+      "votingDisplayTypes": ["CHANNEL_MESSAGE"],
+      "events": [
+        {
+          "name": "christmas",
+          "start": "1.12",
+          "end": "24.12",
+          "emoji": "❄️"
+        }
+      ]
+    }
+  },
+  "announcements": {
+    "automatic": false,
+    "announcementTime": 3,
+    "everyCount": 1,
+    "time": "11:20",
+    "every": "week",
+    "day": 5,
+    "announcementMessages": {
+      "movieNight": {
+        "titleDefault": "Movie night: $date",
+        "descriptionThisWeek": "The next movie night is planned this $weekDay.",
+        "descriptionDefault": "The next movie night is in $dayAmount days.",
+        "movieUndetermined": "Unfortunately the movie ist not determined jet. You can still vote a movie. If the movie is still undetermined one night before the movie night it will be randomly decided.",
+        "reactions": {
+          "\uD83D\uDC4D": "I am in",
+          "\uD83C\uDDED": "I can host",
+          "\uD83C\uDDF8": "I can sponsor"
+        }
+      },
+      "movieNightFinalDecision": {
+        "titleDefault": "Final Movie Decision for the movie night",
+        "descriptionDetermined": "The movie is now determined and is: $movie",
+        "descriptionUndetermined": "The movie was still not determined and was randomly decided. It is ..."
+      },
+      "movieNightStart": {
+        "titleDefault": "Movie night start",
+        "descriptionDefault": "The movie night is starting. Get ready and join the $cinemaChannel channel"
+      }
+    }
+  }
 }

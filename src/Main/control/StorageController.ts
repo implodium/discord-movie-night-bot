@@ -69,8 +69,8 @@ export default class StorageController {
         return new Promise((resolve, reject) => {
             const fileLocation = this.configController.getConfig('storageFileLocation')
 
-            if (fileLocation && process.env.PWD) {
-                resolve(`${process.env.PWD}/${fileLocation}`)
+            if (fileLocation && process.cwd()) {
+                resolve(`${process.cwd()}/${fileLocation}`)
             } else {
                 reject(new InternalError("storage file location is not configured"))
             }

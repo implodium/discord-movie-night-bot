@@ -7,3 +7,5 @@ services:
     build: .
     env_file:
       - config/env/.env.prod
+    volumes:
+      - ./data/:/app/data

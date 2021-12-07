@@ -8,7 +8,7 @@ RUN npm i --only=dev
 
 COPY . ./
 
-RUN npm run webpack:build:prod \
+RUN npm run webpack:build:dev \
     && rm -rf node_modules \
     && npm i --only=prod \
     && cp -rf node_modules dist/node_modules \
