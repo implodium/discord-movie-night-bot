@@ -1,0 +1,10 @@
+version: '3.3'
+
+services:
+  movie-night-app:
+    image: docker.pkg.github.com/implodium/discord-movie-night-bot/discord-movie-night-app:latest
+    container_name: movie-night-app
+    env_file:
+      - config/env/.env.prod
+    volumes:
+      - ./data/:/app/data

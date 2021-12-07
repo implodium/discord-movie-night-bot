@@ -3,17 +3,17 @@ docker-compose push
 
 botName=${PWD##*/}
 
-ssh discordpi "
+ssh oravm "
 mkdir ~/discordBots/$botName
 mkdir ~/discordBots/$botName/config
 "
 
-scp docker-compose.deploy.yml discordpi:discordBots/$botName
-scp docker-compose.yml discordpi:discordBots/$botName
-scp -r config/env discordpi:discordBots/$botName/config/
+scp docker-compose.deploy.yml oravm:discordBots/$botName
+scp docker-compose.yml oravm:discordBots/$botName
+scp -r config/env oravm:discordBots/$botName/config/
 
 
-ssh discordpi "
+ssh oravm "
 mkdir ~/discordBots/$botName
 cd ~/discordBots/$botName
 /home/pi/.local/bin/docker-compose -f docker-compose.deploy.yml pull
